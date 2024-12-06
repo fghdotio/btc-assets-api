@@ -87,6 +87,7 @@
     "prettier": "^3.2.5",
     "simple-git-hooks": "^2.10.0",
     "tiny-secp256k1": "^2.2.3",
+    "ts-node": "^10.9.2",
     "tsx": "^4.7.1",
     "typescript": "^5.3.3",
     "vercel": "^33.5.1",
