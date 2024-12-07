@@ -28,25 +28,26 @@ import { ZodAny } from 'zod';
 async function routes(fastify: FastifyInstance) {
   fastify.log.info(`Process env: ${JSON.stringify(getSafeEnvs(), null, 2)}`);
 
-  await fastify.register(cors);
-  await fastify.register(sentry);
-  fastify.register(sensible);
-  fastify.register(compress);
-  fastify.register(swagger);
-  fastify.register(jwt);
-  fastify.register(ipBlock);
-  fastify.register(cache);
-  fastify.register(rateLimit);
-  fastify.register(healthcheck);
+  await fastify.register(cors); // ***
+  await fastify.register(sentry); // ***
+  fastify.register(sensible); // *** third party: This plugin adds some useful utilities to your Fastify instance
+  fastify.register(compress); // *** third party: Adds compression utils to the Fastify reply object and a hook to decompress requests payloads.
+  fastify.register(swagger); // ***
+  fastify.register(jwt); // ***
+  fastify.register(ipBlock); // ***
+  fastify.register(cache); // ***
+  fastify.register(rateLimit); // ***
+  fastify.register(healthcheck); // ***
 
   const env = container.resolve('env');
   await container.resolve('bitcoin').checkNetwork(env.NETWORK as NetworkType);
 
   fastify.register(internalRoutes, { prefix: '/internal' });
-  fastify.register(tokenRoutes, { prefix: '/token' });
+  fastify.register(tokenRoutes, { prefix: '/token' }); // ***
   fastify.register(bitcoinRoutes, { prefix: '/bitcoin/v1' });
   fastify.register(rgbppRoutes, { prefix: '/rgbpp/v1' });
 
+  // * https://vercel.com/docs/cron-jobs
   // register cron routes only on Vercel
   if (provider === 'vercel' || env.NODE_ENV === 'test') {
     fastify.log.info('Cron routes is registered');
@@ -86,6 +87,7 @@ export function buildFastify() {
   app.setSerializerCompiler(serializerCompiler);
 
   container.register({ logger: asValue(app.log) });
+  // * 将 container 对象添加到 Fastify 实例上，可以通过 fastify.container 在任何路由或插件中获取容器实例
   app.decorate('container', container);
 
   app.register(routes);

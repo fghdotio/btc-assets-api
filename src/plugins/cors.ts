@@ -12,10 +12,12 @@ export default fp(async (fastify) => {
         maxAge: 60 * 60 * 24,
       };
 
+      // * JWT_IGNORE_URLS 定义的路径不检查跨域
       if (
         request.method.toLowerCase() === 'options' ||
         JWT_IGNORE_URLS.some((prefix) => request.url.startsWith(prefix))
       ) {
+        // * 允许所有来源
         corsOptions.origin = true;
         return corsOptions;
       }

@@ -16,6 +16,8 @@ const bitcoinRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
   fastify.decorate('utxoSyncer', container.resolve<UTXOSyncer>('utxoSyncer'));
   fastify.decorate('rgbppCollector', container.resolve<RgbppCollector>('rgbppCollector'));
 
+  // * mempool 的经过 mempool.js 封装
+
   fastify.register(infoRoute);
   fastify.register(blockRoutes, { prefix: '/block' });
   fastify.register(transactionRoutes, { prefix: '/transaction' });

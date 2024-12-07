@@ -15,8 +15,10 @@ export default fp(async (fastify) => {
     integrations: [...(env.SENTRY_PROFILES_SAMPLE_RATE > 0 ? [new ProfilingIntegration()] : [])],
     environment: env.NODE_ENV,
     release: pkg.version,
+    // * 禁用 Sentry 的默认错误处理
     // handle error in the errorResponse function below
     shouldHandleError: () => false,
+    // * 发往 Sentry 的错误信息
     errorResponse: (error, _, reply) => {
       if (error instanceof BitcoinClientAPIError) {
         reply.status(error.statusCode ?? HttpStatusCode.InternalServerError).send({ message: error.message });
@@ -33,7 +35,7 @@ export default fp(async (fastify) => {
 
       // captureException only for 5xx errors or unknown errors
       if (!error.statusCode || error.statusCode >= HttpStatusCode.InternalServerError) {
-        fastify.log.error(error);
+        fastify.log.error(error); // ! TODO: this can be removed. fastify will log errors that are not handled
         fastify.Sentry.captureException(error);
       }
       reply.status(error.statusCode ?? HttpStatusCode.InternalServerError).send({

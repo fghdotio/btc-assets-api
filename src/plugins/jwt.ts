@@ -33,8 +33,10 @@ export default fp(async (fastify) => {
       return true;
     },
   });
+  // * onRequest 收到 HTTP 请求时最先触发
   fastify.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
     fastify.Sentry.setTag('request.url', request.url);
+    // * 放行
     if (
       request.method.toLowerCase() === 'options' ||
       JWT_IGNORE_URLS.some((prefix) => request.url.startsWith(prefix))
@@ -46,9 +48,9 @@ export default fp(async (fastify) => {
       const jwt = (await request.jwtDecode()) as JwtPayload;
       if (jwt) {
         fastify.Sentry.setTags({
-          'token.id': jwt.jti,
-          'token.app': jwt.sub,
-          'token.domain': jwt.aud,
+          'token.id': jwt.jti, // * JWT ID
+          'token.app': jwt.sub, // * Subject
+          'token.domain': jwt.aud, // * Audience
         });
       }
       if (!jwt.aud) {

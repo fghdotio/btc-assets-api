@@ -23,9 +23,11 @@ function setCacheControlHeaders(reply: FastifyReply) {
 export default fp(async (fastify) => {
   try {
     const redis = fastify.container.resolve('redis');
+    // * 注册 redis 插件（这是遇到过的超时问题可能的根源）
     await fastify.register(import('@fastify/redis'), { client: redis });
 
     fastify.addHook('onRequest', (request, reply, done) => {
+      // * /docs 请求不缓存
       if (request.url.startsWith(DOCS_ROUTE_PREFIX)) {
         done();
         return;
@@ -33,6 +35,7 @@ export default fp(async (fastify) => {
 
       // if the request cache is exist, return it
       const key = getCacheKey(request);
+      // * 记录从 startSpan 开始到回调函数结束的时间，成功或失败都会记录
       fastify.Sentry.startSpan({ op: 'cache/get', name: key }, () => {
         fastify.redis.get(key, async (err, result) => {
           if (!err && result) {
@@ -51,12 +54,15 @@ export default fp(async (fastify) => {
             fastify.Sentry.captureException(err);
           }
 
+          // * 标记为命中缓存的请求
           reply.header(CUSTOM_HEADERS.ApiCache, ApiCacheStatus.Miss);
           done();
         });
       });
     });
 
+    // * 在响应发送回客户端之前执行
+    // * next(); 将控制权传递给下一个 hook
     fastify.addHook('onSend', (request, reply, payload, next) => {
       if (request.url.startsWith(DOCS_ROUTE_PREFIX)) {
         next();
@@ -70,8 +76,10 @@ export default fp(async (fastify) => {
         return;
       }
 
+      // * 由各个 handler 自行设置 CUSTOM_HEADERS.ResponseCacheable 的值
       // if the response is cacheable, cache it for future requests
       if (reply.getHeader(CUSTOM_HEADERS.ResponseCacheable) === 'true' && payload) {
+        // * 只缓存请求成功的结果
         const response = JSON.parse(payload as string);
         if (response.ok === false || !payload) {
           next();
@@ -97,7 +105,7 @@ export default fp(async (fastify) => {
       next();
     });
   } catch (err) {
-    fastify.log.error(err);
+    fastify.log.error(err, 'cache');
     fastify.Sentry.captureException(err);
   }
 });

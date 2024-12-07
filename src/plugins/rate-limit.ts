@@ -5,6 +5,7 @@ import rateLimit from '@fastify/rate-limit';
 export default fp(async (fastify) => {
   try {
     const redis = fastify.container.resolve('redis');
+    // * 使用 redis 存储限流信息
     fastify.register(rateLimit, {
       max: env.RATE_LIMIT_PER_MINUTE,
       redis,

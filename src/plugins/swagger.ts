@@ -10,7 +10,7 @@ export const DOCS_ROUTE_PREFIX = '/docs';
 
 export default fp(async (fastify) => {
   fastify.register(swagger, {
-    hideUntagged: true,
+    hideUntagged: true, // * internalRoutes 没有 tag，不会对外暴露
     openapi: {
       openapi: '3.1.0',
       info: {
@@ -31,6 +31,7 @@ export default fp(async (fastify) => {
     },
     transform: jsonSchemaTransform,
     transformObject: ({ openapiObject }) => {
+      // * 隐藏敏感路径
       if (env.NODE_ENV === 'production') {
         const { paths = {} } = openapiObject;
         openapiObject.paths = Object.entries(paths).reduce((acc, [path, methods]) => {
