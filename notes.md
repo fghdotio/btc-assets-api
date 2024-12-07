@@ -1,3 +1,4 @@
+debug 时记住 
 
 By default, register creates a new scope, this means that if you make some changes to the Fastify instance (via decorate), this change will not be reflected by the current context ancestors, but only by its descendants.  
 > https://fastify.dev/docs/latest/Reference/Plugins/#plugins
@@ -5,7 +6,7 @@ By default, register creates a new scope, this means that if you make some chang
 
 
 
-- [ ] debug：监听文件改动，自动重启
+- [x] debug：监听文件改动，自动重启
 
 ```bash
 curl -X 'GET' \

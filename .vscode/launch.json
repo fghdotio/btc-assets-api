@@ -30,7 +30,13 @@
       },
       "console": "integratedTerminal",
       "autoAttachChildProcesses": true,
-      "trace": true
+      "trace": true,
+      "restart": true,
+      "runtimeExecutable": "nodemon",
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ],
     },  
   ]
 }
