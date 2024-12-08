@@ -13,6 +13,7 @@ export const TestnetTypeMap: Record<NetworkType, BTCTestnetType | undefined> = {
   [NetworkType.signet]: 'Signet',
 };
 
+// * 内部使用的 HTTP Headers，独立于 HTTP 标准 Headers
 export const CUSTOM_HEADERS = {
   ApiCache: 'x-api-cache',
   ResponseCacheable: 'x-response-cacheable',

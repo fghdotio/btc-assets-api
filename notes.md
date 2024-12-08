@@ -1,4 +1,7 @@
-debug 时记住 
+debug 时记住 `ResponseCacheable` 的路由，会走缓存。
+
+由各个 handler 自行设置 `ResponseCacheable` 的值，配合 `ResponseCacheMaxAge` 设置缓存时间，默认值是 `const MAX_AGE_FOREVER = 60 * 60 * 24 * 365 * 5;`。
+
 
 By default, register creates a new scope, this means that if you make some changes to the Fastify instance (via decorate), this change will not be reflected by the current context ancestors, but only by its descendants.  
 > https://fastify.dev/docs/latest/Reference/Plugins/#plugins

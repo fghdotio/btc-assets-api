@@ -35,7 +35,7 @@ export default fp(async (fastify) => {
 
       // captureException only for 5xx errors or unknown errors
       if (!error.statusCode || error.statusCode >= HttpStatusCode.InternalServerError) {
-        fastify.log.error(error); // ! TODO: this can be removed. fastify will log errors that are not handled
+        fastify.log.error(error); // * TODO: this can be removed. fastify will log errors that are not handled
         fastify.Sentry.captureException(error);
       }
       reply.status(error.statusCode ?? HttpStatusCode.InternalServerError).send({
