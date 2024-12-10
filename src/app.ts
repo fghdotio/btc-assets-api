@@ -44,7 +44,7 @@ async function routes(fastify: FastifyInstance) {
 
   fastify.register(internalRoutes, { prefix: '/internal' });
   fastify.register(tokenRoutes, { prefix: '/token' }); // ***
-  fastify.register(bitcoinRoutes, { prefix: '/bitcoin/v1' });
+  fastify.register(bitcoinRoutes, { prefix: '/bitcoin/v1' }); // ***
   fastify.register(rgbppRoutes, { prefix: '/rgbpp/v1' });
 
   // * https://vercel.com/docs/cron-jobs
@@ -55,6 +55,7 @@ async function routes(fastify: FastifyInstance) {
   } else {
     fastify.log.info('Cron plugin is registered');
     await fastify.register(cron);
+    // * 服务器准备就绪（所有插件加载完成）
     fastify.addHook('onReady', () => {
       fastify.cron.startAllJobs();
     });

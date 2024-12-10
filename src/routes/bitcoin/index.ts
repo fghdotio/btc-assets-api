@@ -18,11 +18,11 @@ const bitcoinRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
 
   // * mempool 的经过 mempool.js 封装
 
-  fastify.register(infoRoute);
-  fastify.register(blockRoutes, { prefix: '/block' });
-  fastify.register(transactionRoutes, { prefix: '/transaction' });
-  fastify.register(addressRoutes, { prefix: '/address' });
-  fastify.register(feesRoutes, { prefix: '/fees' });
+  fastify.register(infoRoute); // ***
+  fastify.register(blockRoutes, { prefix: '/block' }); // ***
+  fastify.register(transactionRoutes, { prefix: '/transaction' }); // ***
+  fastify.register(addressRoutes, { prefix: '/address' }); // ***
+  fastify.register(feesRoutes, { prefix: '/fees' }); // ***
   done();
 };
 

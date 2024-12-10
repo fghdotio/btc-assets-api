@@ -155,6 +155,7 @@ const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
       const { no_cache } = request.query;
 
       const typeScript = getTypeScript(request.query.type_script);
+      // !!! type script 类型检查
       if (!typeScript || !isTypeAssetSupported(typeScript, IS_MAINNET)) {
         throw fastify.httpErrors.badRequest('Unsupported type asset');
       }

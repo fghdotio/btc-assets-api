@@ -209,6 +209,7 @@ export default class RgbppCollector extends BaseQueueWorker<IRgbppCollectRequest
     return pairs;
   }
 
+  // * 多个 RGB++ asset (ckb cell) 可能锁在同一个 btc UTXO 上
   /**
    * Collect the cells for the utxos, return the utxo and the cells
    * @param utxos - the utxos to collect

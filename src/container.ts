@@ -26,11 +26,14 @@ export interface Cradle {
 }
 
 const container = createContainer<Cradle>({
+  // * InjectionMode.PROXY (default): Injects a proxy to functions/constructors which looks like a regular object.
+  // * https://github.com/jeffijoe/awilix
   injectionMode: InjectionMode.PROXY,
   strict: true,
 });
 
 container.register({
+  // * Tells Awilix to provide the given value as-is.
   env: asValue(env),
   logger: asValue(pino()),
   redis: asValue(
@@ -38,6 +41,7 @@ container.register({
       maxRetriesPerRequest: null,
     }),
   ),
+  // * Tells Awilix to instantiate the given function as a class using new.
   ckb: asClass(CKBClient).singleton(),
   bitcoin: asClass(BitcoinClient).singleton(),
   spv: asClass(SPVClient).singleton(),

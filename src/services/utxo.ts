@@ -41,6 +41,7 @@ export default class UTXOSyncer extends BaseQueueWorker<IUTXOSyncRequest, IUTXOS
   constructor(cradle: Cradle) {
     const defaultJobOptions = UTXOSyncer.getDefaultJobOptions(cradle);
     const repeatStrategy = UTXOSyncer.getRepeatStrategy(cradle);
+    // * As you may notice, the repeat strategy setting should be provided in Queue and Worker classes. The reason we need in both places is because the first time we add the job to the Queue we need to calculate when is the next iteration, but after that the Worker takes over and we use the worker settings.
     super({
       name: UTXO_SYNCER_QUEUE_NAME,
       connection: cradle.redis,
@@ -51,7 +52,10 @@ export default class UTXOSyncer extends BaseQueueWorker<IUTXOSyncRequest, IUTXOS
         },
       },
       worker: {
+        // * When a worker is processing a job it will keep the job "locked" so other workers can't process it.
         lockDuration: 60_000,
+        // * The simplest option is to set removeOnComplete/removeOnFail to {count: 0}, in this case, all jobs will be removed automatically as soon as they are finalized
+        // * https://docs.bullmq.io/guide/workers/auto-removal-of-jobs#remove-all-finalized-jobs
         removeOnComplete: { count: 0 },
         removeOnFail: { count: 0 },
         settings: {
@@ -81,6 +85,7 @@ export default class UTXOSyncer extends BaseQueueWorker<IUTXOSyncRequest, IUTXOS
     };
   }
 
+  // * 下一次执行的时间
   public static getRepeatStrategy(cradle: Cradle) {
     return (millis: number, opts: RepeatOptions) => {
       const { count = 0 } = opts;
@@ -161,6 +166,7 @@ export default class UTXOSyncer extends BaseQueueWorker<IUTXOSyncRequest, IUTXOS
     );
   }
 
+  // * 1s 最多有一个 job 被 enqueue
   private enqueueSyncJobThrottle = throttle((address) => this._enqueueSyncJob(address), 1000, {
     leading: true,
   });

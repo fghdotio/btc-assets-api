@@ -27,14 +27,18 @@ export default abstract class BaseQueueWorker<T, R> {
     });
     this.worker = new Worker(
       name,
+      // * 处理 job 的函数，包装了一层，添加了 Sentry 跟踪
       async (job: Job<T>) => {
         const span = Sentry.startInactiveSpan({ name: this.constructor.name, op: 'process' });
         const returnvalue = await this.process(job);
         span?.end();
         return returnvalue;
       },
+      // * https://api.docs.bullmq.io/interfaces/v5.WorkerOptions.html
       {
         connection,
+        // * 手动触发执行
+        // * this.worker.run();
         autorun: false,
         ...worker,
       },

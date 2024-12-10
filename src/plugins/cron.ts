@@ -10,7 +10,9 @@ export default fp(async (fastify) => {
   try {
     const env: Env = fastify.container.resolve('env');
 
+    // * 跟踪任务（cron job）的执行状态，宏观监控 cron job 这种自动执行定时任务的方式，并非监控某个具体 job 的成功与否
     const getSentryCheckIn = (monitorSlug: string, crontab: string) => {
+      // * 创建新检查点
       const checkInId = fastify.Sentry.captureCheckIn(
         {
           monitorSlug,
@@ -27,6 +29,7 @@ export default fp(async (fastify) => {
           recovery_threshold: 3,
         },
       );
+      // * 任务成功，调用 ok 更新状态，失败调用 error；
       return {
         ok: () => {
           fastify.Sentry.captureCheckIn({
