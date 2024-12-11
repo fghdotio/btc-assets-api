@@ -49,6 +49,9 @@ const transactionRoute: FastifyPluginCallback<Record<never, never>, Server, ZodT
     },
   );
 
+  // * 查找一条 btc 交易中的 utxo 对应的终态 rgb++ ckb 交易
+  // * 对于 queryRgbppLockTxByBtcTx，btc_txid 是新生成的、未消费的、用于锁定的交易；
+  // * 对于 queryBtcTimeLockTxByBtcTx，btc_txid 是已消费的、用于确权的交易；
   fastify.get(
     '/:btc_txid',
     {
@@ -69,6 +72,7 @@ const transactionRoute: FastifyPluginCallback<Record<never, never>, Server, ZodT
       const { btc_txid } = request.params;
       // get the transaction hash from the job if it exists
       const job = await fastify.transactionProcessor.getTransactionRequest(btc_txid);
+      // * 当一个作业成功完成时，处理器（processor）返回的值会被存储在这个 returnvalue 属性中
       if (job?.returnvalue) {
         return { txhash: job.returnvalue };
       }
@@ -145,6 +149,7 @@ const transactionRoute: FastifyPluginCallback<Record<never, never>, Server, ZodT
       };
 
       if (with_data === 'true') {
+        // * ckbVirtualResult 是不完整的，没有 btc tx id 和 spv proof
         const { txid, ckbVirtualResult } = job.data;
         jobInfo.data = {
           txid,
@@ -185,6 +190,7 @@ const transactionRoute: FastifyPluginCallback<Record<never, never>, Server, ZodT
       }
       const state = await job.getState();
       if (state === 'failed') {
+        // * 调用 job.retry('failed') 时，BullMQ 会将这个任务从 failed 状态队列中移出
         await job.retry('failed');
         const newState = await job.getState();
         return {

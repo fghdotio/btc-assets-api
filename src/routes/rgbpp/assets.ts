@@ -145,6 +145,7 @@ const assetsRoute: FastifyPluginCallback<Record<never, never>, Server, ZodTypePr
         return null;
       }
       if (isUDTTypeSupported(typeScript, IS_MAINNET)) {
+        // * const outputsData = [append0x(u128ToLe(launchAmount)), encodeRgbppTokenInfo(rgbppTokenInfo)];
         const infoCell = await fastify.ckb.getInfoCellData(typeScript);
         const typeHash = computeScriptHash(typeScript);
         if (!infoCell) {

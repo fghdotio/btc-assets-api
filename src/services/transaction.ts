@@ -170,6 +170,7 @@ export default class TransactionProcessor
     return getCommitmentFromBtcTx(tx);
   }
 
+  // ***
   /**
    * Verify transaction request
    * - check if the commitment matches the Bitcoin transaction
@@ -207,6 +208,7 @@ export default class TransactionProcessor
     return true;
   }
 
+  // ***
   /**
    * Move job to delayed
    * @param job - the job to move
@@ -341,6 +343,7 @@ export default class TransactionProcessor
     ckbVirtualResult: CKBVirtualResult,
     signedTx: CKBRawTransaction,
   ) {
+    // * 验证比特币交易中是否包含支付给 paymaster 的 UTXO
     if (this.cradle.paymaster.enablePaymasterReceivesUTXOCheck) {
       // make sure the paymaster received a UTXO as container fee
       const hasPaymasterUTXO = this.cradle.paymaster.hasPaymasterReceivedBtcUTXO(btcTx);
@@ -357,6 +360,7 @@ export default class TransactionProcessor
 
     const isSporeTransfer = this.hasSporeTypeDep(signedTx);
     if (isSporeTransfer) {
+      // * 移除 witnesses 数组中的最后一个元素，这个位置之后需要被真正的 spore cobuild witness 替换
       signedTx.witnesses = signedTx.witnesses.slice(0, -1);
     }
     const tx = await this.cradle.paymaster.appendCellAndSignTx(btcTx.txid, {
@@ -364,6 +368,7 @@ export default class TransactionProcessor
       ckbRawTx: signedTx!,
     });
     if (isSporeTransfer) {
+      // * 这个占位符后续会在 appendSporeCobuildWitness 方法中被替换为实际的 spore cobuild witness
       tx.witnesses.push('0x');
     }
     return tx;
@@ -387,12 +392,13 @@ export default class TransactionProcessor
       ckbVirtualResult: {
         ...ckbVirtualResult,
         ckbRawTx,
-        needPaymasterCell: true,
+        needPaymasterCell: true, // * 添加 paymaster 支付额外的手续费
       },
     });
     await this.moveJobToDelayed(job);
   }
 
+  // * 当 process 方法正常返回时，任务自动标记为 completed
   /**
    * Process the transaction request, called by the worker
    * - get the Bitcoin transaction
@@ -445,6 +451,9 @@ export default class TransactionProcessor
         // then the RGB++ cells cache will be updated with the latest UTXO data
         if (this.cradle.env.UTXO_SYNC_DATA_CACHE_ENABLE) {
           try {
+            // * filter 过滤空值
+            // * 为什么不更新 vin：UTXO 就是未花费的，vin 是已花费的；
+            // ? 为什么没有同时 fastify.rgbppCollector.enqueueCollectJob(address);
             const addresses = btcTx.vout.map((vout) => vout.scriptpubkey_address).filter((address) => address);
             await Promise.all(addresses.map((address) => this.cradle.utxoSyncer.enqueueSyncJob(address!)));
           } catch (err) {
@@ -452,6 +461,7 @@ export default class TransactionProcessor
             // already catch the error inside the utxo syncer
           }
         }
+        // * 存储在 job.returnvalue
         return txHash;
       } catch (err) {
         // fix the pool rejected transaction by increasing the fee rate
@@ -469,6 +479,7 @@ export default class TransactionProcessor
       }
     } catch (err) {
       this.cradle.logger.debug(err);
+      // * 未找到交易
       if (err instanceof BitcoinClientAPIError && err.statusCode === HttpStatusCode.NotFound) {
         // move the job to delayed queue if the transaction is not found yet
         // only delay the job when the job is created less than 1 hour to make sure the transaction is existed
@@ -482,6 +493,7 @@ export default class TransactionProcessor
         }
       }
 
+      // * 交易未确认或未找到 spv proof
       // move the job to delayed queue if the transaction not confirmed or spv proof not found yet
       const transactionNotConfirmed = err instanceof TransactionNotConfirmedError;
       const spvProofNotReady = err instanceof BitcoinSPVError;

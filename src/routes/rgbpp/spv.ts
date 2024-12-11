@@ -48,6 +48,7 @@ const spvRoute: FastifyPluginCallback<Record<never, never>, Server, ZodTypeProvi
     },
   );
 
+  // * 插件注册完成信号
   done();
 };
 

@@ -47,6 +47,7 @@ export default class Paymaster implements IPaymaster {
     this.queue = new Queue(PAYMASTER_CELL_QUEUE_NAME, {
       connection: cradle.redis,
     });
+    // * Paymaster 没有继承 BaseQueueWorker，没有 autorun: false，new 后会自动运行
     this.worker = new Worker(PAYMASTER_CELL_QUEUE_NAME, undefined, {
       connection: cradle.redis,
       lockDuration: 60_000,
@@ -226,6 +227,7 @@ export default class Paymaster implements IPaymaster {
    * make sure the queue has enough cells to use for the next transactions
    */
   public async refillCellQueue() {
+    // * 队列中 paymaster cell 的数量
     const queueSize = await this.queue.getWaitingCount();
     let filled = 0;
     if (queueSize >= this.presetCount) {
@@ -247,6 +249,7 @@ export default class Paymaster implements IPaymaster {
       const job = await this.queue.getJob(jobId);
       if (job) {
         this.cradle.logger.info(`[Paymaster] Paymaster cell already in the queue: ${jobId}`);
+        // * job 是活跃的，但已处理时间超过 1 分钟且未完成；这种情况可能是由于 appendCellAndSignTx 抛出错误时 job 没有正确移到 delayed 状态造成的
         // cause the issue that the job is not moved to delayed when appendCellAndSignTx throw error
         // try to remove the inactive job and add the cell back to the queue
         // (inactive job means the job is processed on 1 minute ago but not completed)

@@ -18,10 +18,10 @@ const rgbppRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodTypePr
   fastify.decorate('spv', container.resolve('spv'));
 
   fastify.register(transactionRoutes, { prefix: '/transaction' });
-  fastify.register(assetsRoute, { prefix: '/assets' });
-  fastify.register(addressRoutes, { prefix: '/address' });
-  fastify.register(spvRoute, { prefix: '/btc-spv' });
-  fastify.register(paymasterRoutes, { prefix: '/paymaster' });
+  fastify.register(assetsRoute, { prefix: '/assets' }); // ***
+  fastify.register(addressRoutes, { prefix: '/address' }); // ***
+  fastify.register(spvRoute, { prefix: '/btc-spv' }); // ***
+  fastify.register(paymasterRoutes, { prefix: '/paymaster' }); // ***
   done();
 };
 

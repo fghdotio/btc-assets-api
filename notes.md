@@ -4,24 +4,59 @@
   - "Get the balance of a bitcoin address" && `UTXO_SYNC_DATA_CACHE_ENABLE` 触发更新；
 2. `export const RGBPP_COLLECTOR_QUEUE_NAME = 'rgbpp-collector-queue';`
   - "Get the balance of a bitcoin address" && `RGBPP_COLLECT_DATA_CACHE_ENABLE` 触发更新；
-debug 时记住 `ResponseCacheable` 的路由，会走缓存。
+  - [ ] Get the CKB transaction hash by BTC txid.
+  - [ ] `async isIsomorphicTx`
 3. [ ] `export const TRANSACTION_QUEUE_NAME = 'rgbpp-ckb-transaction-queue';`
+  - 上面两个队列的 removeOnComplete 和 removeOnFail 设置为 { count: 0 }，会自动删除，此队列不会自动删除；
+  - `const job = await this.queue.add(request.txid, request, {`，`txid` 是 btc tx id；
+4. `export const PAYMASTER_CELL_QUEUE_NAME = 'rgbpp-ckb-paymaster-cell-queue';`
+  - Paymaster 没有继承 BaseQueueWorker，没有 autorun: false，new 后会自动运行；
+  - 会自动删除；
+  - `const jobId = `${outPoint.txHash}:${outPoint.index}`;`
 
 cron job:
 - Cron plugin 负责启动 3 个消息队列的 worker；
 - 注册两个 cron job `jobs: [retryMissingTransactionsJob, unlockBTCTimeLockCellsJob],`
   - `*/5 * * * *` 
 
+debug 时记住 `ResponseCacheable` 的路由，会走缓存。
 
-- [ ] `retryMissingTransactionsJob`
+paymaster:
+- `getRgbppPaymasterInfo` 返回配置；
+- paymaster 支付 ckb，获得 btc 7000；
 
-- [ ] `internalRoutes`
+cache
+- 惯用流程：先从缓存读，同时触发缓存更新，以便下次读取到更新后的缓存；
+1. `prefix: 'ckb-info-cell-txs'`
+2. `prefix: 'rgbpp-collector-data'`
+3. `prefix: 'utxo-syncer-data'`
+
+
+- [x] `retryMissingTransactionsJob`
+  - retry 因 btc 交易为找到而没执行的 `/ckb-tx` job；
+
+- [x] `internalRoutes`
+
 
 由各个 handler 自行设置 `ResponseCacheable` 的值，配合 `ResponseCacheMaxAge` 设置缓存时间，默认值是 `const MAX_AGE_FOREVER = 60 * 60 * 24 * 365 * 5;`。
 
 
 By default, register creates a new scope, this means that if you make some changes to the Fastify instance (via decorate), this change will not be reflected by the current context ancestors, but only by its descendants.  
 > https://fastify.dev/docs/latest/Reference/Plugins/#plugins
+
+- [x] unique info cell 为什么要用 btc time lock script：
+
+```ts
+// 永久锁定，不能解锁
+{
+  lock: genBtcTimeLockScript(UNLOCKABLE_LOCK_SCRIPT, isMainnet, btcTestnetType),
+  type: {
+    ...getUniqueTypeScript(isMainnet),
+    args: generateUniqueTypeArgs(inputs[0], 1),
+  },
+  capacity: append0x(infoCellCapacity.toString(16)),
+},
+```
 
 - [x] unlocker
    - 把 time lock 锁的 cell 变成 owner lock script 锁的 cell；
@@ -73,6 +108,29 @@ if (!cellDepsSet.has(serializeOutPoint(spvClient))) {
 const btcTimeWitness = append0x(
   serializeWitnessArgs({ lock: buildBtcTimeUnlockWitness(proof), inputType: '', outputType: '' }),
 );
+```
+
+RGB++ Script:
+
+```ts
+export const buildRgbppUnlockWitness = (
+  btcTxBytes: Hex,
+  btcTxProof: Hex,
+  inputsLen: number,
+  outputsLen: number,
+): Hex => {
+  const inputLen = append0x(u8ToHex(inputsLen));
+  const outputLen = append0x(u8ToHex(outputsLen));
+
+  const version = Uint16.pack([0, 0]);
+  const rgbppUnlock = RGBPPUnlock.pack({
+    version,
+    extraData: { inputLen, outputLen },
+    btcTx: append0x(btcTxBytes),
+    btcTxProof: append0x(btcTxProof),
+  });
+  return append0x(bytesToHex(rgbppUnlock));
+};
 ```
 
 !!! `!isTypeAssetSupported`

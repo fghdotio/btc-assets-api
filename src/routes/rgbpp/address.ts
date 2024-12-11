@@ -186,6 +186,7 @@ const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
       const pendingUtxos = utxos.filter(
         (utxo) =>
           !utxo.status.confirmed ||
+          // * 确认时间在 20 min 以内的也认为是 pending
           // include utxo that confirmed in 20 minutes to avoid missing pending xudt
           (utxo.status.block_time && Date.now() / 1000 - utxo.status.block_time < 20 * 60),
       );
@@ -308,6 +309,7 @@ const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
     return isomorphicTx;
   }
 
+  // * pass for now
   fastify.get(
     '/:btc_address/activity',
     {
