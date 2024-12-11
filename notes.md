@@ -14,6 +14,8 @@
   - 会自动删除；
   - `const jobId = `${outPoint.txHash}:${outPoint.index}`;`
 
+- [ ] `getInscriptionInfoCellData`
+
 cron job:
 - Cron plugin 负责启动 3 个消息队列的 worker；
 - 注册两个 cron job `jobs: [retryMissingTransactionsJob, unlockBTCTimeLockCellsJob],`
