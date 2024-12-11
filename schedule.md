@@ -1,4 +1,4 @@
-btc-assets-api & rgbpp-sdk Doge 开发计划
+Doge btc-assets-api & rgbpp-sdk 开发计划
 
 ## btc-assets-api
 
@@ -16,7 +16,7 @@ btc-assets-api & rgbpp-sdk Doge 开发计划
    - `GET /dogecoin/vl/address/{address}/unspent`
    - `GET /dogecoin/v1l/address/{address}/txs`
    - `GET /dogecoin/v1/fees/recommended`
-     - 备选 api：
+     - 备选 API：
        - https://chain.so/api/
        - https://cryptoapis.io/
 2. `DogeUTXOSyncer`：Doge 地址的 UTXO 缓存模块
