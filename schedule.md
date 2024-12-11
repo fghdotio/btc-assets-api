@@ -30,3 +30,7 @@ btc-assets-api & rgbpp-sdk Doge 开发计划
 12.16-12.18：
 1. 部署 mock RGB++ Lock Script（关闭 `check_btc_tx_exists`）校验；
 2. Doge 交易签名；
+
+12.18-12.25：
+1. 联调 Doge SPV service；
+2. 制定 rgbpp-sdk 重构方案；
