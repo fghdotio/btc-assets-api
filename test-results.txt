@@ -1,0 +1,40 @@
+[33mThe CJS build of Vite's Node API is deprecated. See https://vitejs.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v1.3.1 /root/ckb/btc-assets-api-doge
+
+stdout | src/services/doge/restapi.test.ts > RestApiDogeClient > getTxHex > should return the hex of the transaction
+01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0403907d67ffffffff010010a5d4e80000001976a914be6ce3784a50a06a22e234181696f56b1aaf29ad88ac00000000
+
+stdout | src/services/doge/restapi.test.ts > RestApiDogeClient > getTx > should return the transaction
+{
+  index: 0,
+  isConfirmed: true,
+  minedInBlockHash: 'c5d2896a703609199e435cfd57f63163299c562ea8118eb8326a6e73b69d2cf2',
+  minedInBlockHeight: 6782352,
+  recipients: [
+    {
+      address: 'nmZ36RoFkyd9tKqfTk2iBt5UfgLfbcxC98',
+      amount: '10000.00000000'
+    }
+  ],
+  senders: [ { address: 'coinbase', amount: '10000.00000000' } ],
+  timestamp: 1733945010,
+  transactionHash: '4e19da242cb472fdbf8631a9436b388fa3bee631a0b6bded16a606c3012ffab6',
+  transactionId: '4e19da242cb472fdbf8631a9436b388fa3bee631a0b6bded16a606c3012ffab6',
+  blockchainSpecific: {
+    locktime: 0,
+    size: 89,
+    version: 1,
+    vin: [ [Object] ],
+    vout: [ [Object] ]
+  },
+  fee: { amount: '0', unit: 'DOGE' }
+}
+
+ ✓ src/services/doge/restapi.test.ts  (2 tests) 630ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  15:08:56
+   Duration  2.45s (transform 314ms, setup 1.38s, collect 30ms, tests 630ms, environment 0ms, prepare 137ms)
+

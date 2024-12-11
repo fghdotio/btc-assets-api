@@ -1,23 +1,25 @@
 version: '3.8'
 
 services:
-  app:
-    build:
-      context: .
-    # Or use the image from the GitHub registry
-    # image: ghcr.io/ckb-cell/btc-assets-api:develop
-    ports:
-      - '3000:3000'
-    networks:
-      - redis-internal
-    env_file:
-      - .env
-    depends_on:
-      - redis
+  # app:
+  #   build:
+  #     context: .
+  #   # Or use the image from the GitHub registry
+  #   # image: ghcr.io/ckb-cell/btc-assets-api:develop
+  #   ports:
+  #     - '3000:3000'
+  #   networks:
+  #     - redis-internal
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - redis
 
   redis:
     # https://github.com/docker-library/redis/blob/b77450d/7.2/alpine/Dockerfile
     image: redis:7-alpine
+    ports:
+      - '6379:6379'
     networks:
       - redis-internal
     # Redis' WORKDIR is /data
