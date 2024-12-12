@@ -1,4 +1,5 @@
 import { describe, beforeEach, it } from 'vitest';
+import { DogeMemoryWalletProvider, createP2PKHTransaction } from 'doge-sdk';
 
 import { RestApiDogeClient } from './restapi';
 
@@ -13,6 +14,39 @@ describe('RestApiDogeClient', () => {
   const testnetBlockHash: string = '577f016bbf165a905fc7778f89d3ccc5be04b5cfd1490004fa21746cf9decf4c';
   const testnetTxId: string = 'de5df2efbf03237f71aa420cbd189d16fc1beb8b902fa8643d5930479e9ca0c3';
   const testnetAddress: string = 'nsSfZttkEy2ZkujJUmQvKdjsTVRXSAwSvm';
+  // nWujuS2wgYTbyL7B3dk7RoLb7KqfEY7tVS
+  const testnetWif: string = 'QWzHvo6EBqEpYADitbmV7Ybq9ufGN3q16fvVc2dXH9egQSpCr64A';
+
+  describe('postTx', () => {
+    it('should return the tx', async () => {
+      const walletProvider = new DogeMemoryWalletProvider();
+      const wallet = walletProvider.addWalletFromWIF(testnetWif, 'dogeTestnet');
+
+      const utxos = await testnetClient.getAddressTxsUtxo({ address: wallet.address });
+      if (utxos.length === 0) {
+        throw new Error('No utxos found');
+      }
+      const formattedUtxo = {
+        txid: utxos[2].transactionId,
+        vout: utxos[2].index,
+        value: parseFloat(utxos[2].amount) * 10 ** 8,
+      };
+      console.log(utxos.length, formattedUtxo);
+
+      const fee = 2_333_000;
+      const txBuilder = createP2PKHTransaction(wallet, {
+        inputs: [formattedUtxo],
+        outputs: [
+          { address: testnetAddress, value: 280_000 },
+          { address: wallet.address, value: formattedUtxo.value - fee },
+        ],
+        address: wallet.address,
+      });
+      const finalizedTx = await txBuilder.finalizeAndSign();
+      const txHex = finalizedTx.toHex();
+      console.log(await testnetClient.postTx({ txHex }));
+    });
+  });
 
   describe('getBlocksTipHash', () => {
     it('should return the latest block hash', async () => {
@@ -70,5 +104,6 @@ describe('RestApiDogeClient', () => {
 });
 
 /* 
-pnpm vitest run src/services/doge/restapi.test.ts -t "getBlock should return the block"
+pnpm vitest run src/services/doge/restapi.test.ts -t "postTx"
+pnpm vitest run src/services/doge/restapi.test.ts -t "getAddressTxs should return the transactions"
 */

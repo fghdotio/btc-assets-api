@@ -31,7 +31,7 @@ export class RestApiDogeClient {
     throw new Error('Recommended fees not available');
   }
 
-  public async postTx({ txHex }: { txHex: string }) {
+  public async postTx({ txHex }: { txHex: string }): Promise<string> {
     const txData = {
       data: {
         item: {
@@ -39,10 +39,17 @@ export class RestApiDogeClient {
         },
       },
     };
-    const response = await this.request.post('/transactions/broadcast', txData, {
+    interface PostTxResponse {
+      data: {
+        item: {
+          transactionId: string;
+        };
+      };
+    }
+    const response = await this.request.post<PostTxResponse>('/transactions/broadcast', txData, {
       baseURL: this.baseUrl.replace('blockchain-data', 'blockchain-tools'),
     });
-    return response.data;
+    return response.data.data.item.transactionId;
   }
 
   // https://developers.cryptoapis.io/v-1.2023-04-25-105/RESTapis/unified-endpoints/list-unspent-transaction-outputs-by-address/get

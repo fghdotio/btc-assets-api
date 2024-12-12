@@ -168,6 +168,9 @@ importers:
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
+      doge-sdk:
+        specifier: 0.5.0-beta.4
+        version: 0.5.0-beta.4
       ecpair:
         specifier: ^2.1.0
         version: 2.1.0
@@ -729,6 +732,9 @@ packages:
 
   '@polka/url@1.0.0-next.24':
     resolution: {integrity: sha512-2LuNTFBIO0m7kKIQvvPHN6UE63VjpmL9rnEEaOOaiSPbZK+zUOYIzBAWcED+3XYzhYsd/0mD57VdxAEqqV52CQ==}
+
+  '@qed-noble/secp256k1@2.1.0':
+    resolution: {integrity: sha512-Dh+N1FzFMcUW55jtfH7D4aGb7OGdDSUDAnmAIwfSmXThpqLUQvlQyMTW98At0jvjA2IH78EpFYia1FtKvmFoOA==}
 
   '@rgbpp-sdk/btc@0.4.0':
     resolution: {integrity: sha512-4Fx/UsN2T1CyhyasK565ChofxRFA1JyCSnUuAPh0fpQ2AAcPzrbKGZS65hpOPa/2qClkzzszdXz1sgkbXUCaPg==}
@@ -1583,6 +1589,9 @@ packages:
   doctrine@3.0.0:
     resolution: {integrity: sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==}
     engines: {node: '>=6.0.0'}
+
+  doge-sdk@0.5.0-beta.4:
+    resolution: {integrity: sha512-Jw8gPBwjHDfdjnvbHFLu7kU2IYhY7iCiHaaBExqAuhH9n6bYQMy4Azm4sLZ/YSOz2R1uQEU/NC7rMxwvAC7z6g==}
 
   dotenv@16.4.2:
     resolution: {integrity: sha512-rZSSFxke7d9nYQ5NeMIwp5PP+f8wXgKNljpOb7KtH6SKW1cEqcXAz9VSJYVLKe7Jhup/gUYOkaeSVyK8GJ+nBg==}
@@ -4230,6 +4239,8 @@ snapshots:
 
   '@polka/url@1.0.0-next.24': {}
 
+  '@qed-noble/secp256k1@2.1.0': {}
+
   '@rgbpp-sdk/btc@0.4.0(@ckb-lumos/lumos@0.22.2)':
     dependencies:
       '@bitcoinerlab/secp256k1': 1.1.1
@@ -5233,6 +5244,10 @@ snapshots:
   doctrine@3.0.0:
     dependencies:
       esutils: 2.0.3
+
+  doge-sdk@0.5.0-beta.4:
+    dependencies:
+      '@qed-noble/secp256k1': 2.1.0
 
   dotenv@16.4.2: {}
 
