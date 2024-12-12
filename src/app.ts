@@ -24,6 +24,7 @@ import healthcheck from './plugins/healthcheck';
 import sentry from './plugins/sentry';
 import cron from './plugins/cron';
 import { ZodAny } from 'zod';
+import dogeRoutes from './routes/doge';
 
 async function routes(fastify: FastifyInstance) {
   fastify.log.info(`Process env: ${JSON.stringify(getSafeEnvs(), null, 2)}`);
@@ -46,6 +47,7 @@ async function routes(fastify: FastifyInstance) {
   fastify.register(tokenRoutes, { prefix: '/token' });
   fastify.register(bitcoinRoutes, { prefix: '/bitcoin/v1' });
   fastify.register(rgbppRoutes, { prefix: '/rgbpp/v1' });
+  fastify.register(dogeRoutes, { prefix: '/doge/v1' });
 
   // register cron routes only on Vercel
   if (provider === 'vercel' || env.NODE_ENV === 'test') {

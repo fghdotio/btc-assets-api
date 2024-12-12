@@ -210,6 +210,12 @@ const envSchema = z
      * RGB++ collect data cache expire duration, used to cache the RGB++ collect data
      */
     RGBPP_COLLECT_DATA_CACHE_EXPIRE: z.coerce.number().default(30 * 60 * 1000),
+
+    /* 
+    Dogecoin
+    */
+    DOGE_CRYPTO_APIS_API_KEY: z.string(),
+    DOGE_NETWORK: z.enum(['mainnet', 'testnet']).default('testnet'),
   })
   .and(
     z.union([

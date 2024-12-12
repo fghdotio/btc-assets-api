@@ -1,15 +1,21 @@
 import axios, { AxiosInstance } from 'axios';
 
+import { Block } from './interfaces';
+
+export const baseUrl = 'https://rest.cryptoapis.io/blockchain-data/dogecoin';
+
 // using cryptoapis.io endpoint
 export class RestApiDogeClient {
   private request: AxiosInstance;
+  private baseUrl: string;
 
   constructor(
-    private baseURL: string,
+    network: 'testnet' | 'mainnet',
     private apiKey: string,
   ) {
+    this.baseUrl = `${baseUrl}/${network}`;
     this.request = axios.create({
-      baseURL,
+      baseURL: this.baseUrl,
       headers: {
         'Content-Type': 'application/json',
         'X-API-Key': this.apiKey,
@@ -18,7 +24,7 @@ export class RestApiDogeClient {
   }
 
   public getBaseURL(): string {
-    return this.baseURL;
+    return this.baseUrl;
   }
 
   public async getFeesRecommended() {
@@ -34,7 +40,7 @@ export class RestApiDogeClient {
       },
     };
     const response = await this.request.post('/transactions/broadcast', txData, {
-      baseURL: this.baseURL.replace('blockchain-data', 'blockchain-tools'),
+      baseURL: this.baseUrl.replace('blockchain-data', 'blockchain-tools'),
     });
     return response.data;
   }
@@ -136,7 +142,7 @@ export class RestApiDogeClient {
             chainwork: string;
             difficulty: string;
             merkleRoot: string;
-            nonce: number;
+            nonce: string;
             size: number;
             strippedSize: number;
             version: number;
@@ -147,8 +153,26 @@ export class RestApiDogeClient {
       };
     }
     const response = await this.request.get<BlockResponse>(`/blocks/hash/${hash}`);
-    const { blockchainSpecific, ...rest } = response.data.data.item;
-    return { ...rest, ...blockchainSpecific };
+    const {
+      item: { blockchainSpecific: data, ...rest },
+    } = response.data.data;
+    const blockData = {
+      id: rest.hash,
+      height: parseInt(rest.height, 10),
+      version: data.version,
+      timestamp: rest.timestamp,
+      tx_count: rest.transactionsCount,
+      size: data.size,
+      weight: data.weight,
+      merkle_root: data.merkleRoot,
+      previousblockhash: rest.previousBlockHash,
+      mediantime: rest.timestamp,
+      nonce: parseInt(data.nonce, 10),
+      bits: parseInt(data.bits, 10),
+      difficulty: parseFloat(data.difficulty),
+    };
+    const block = Block.parse(blockData);
+    return block;
   }
 
   // https://developers.cryptoapis.io/v-1.2023-04-25-105/RESTapis/unified-endpoints/get-block-details-by-block-height/get

@@ -3,12 +3,11 @@ import { describe, beforeEach, it } from 'vitest';
 import { RestApiDogeClient } from './restapi';
 
 describe('RestApiDogeClient', () => {
-  let client: RestApiDogeClient;
+  let testnetClient: RestApiDogeClient;
   // dev Crypto APIs
-  const testnetBaseUrl = 'https://rest.cryptoapis.io/blockchain-data/dogecoin/testnet';
 
   beforeEach(() => {
-    client = new RestApiDogeClient(testnetBaseUrl, process.env.CRYPTO_APIS_API_KEY!);
+    testnetClient = new RestApiDogeClient('testnet', process.env.DOGE_CRYPTO_APIS_API_KEY!);
   });
 
   const testnetBlockHash: string = '577f016bbf165a905fc7778f89d3ccc5be04b5cfd1490004fa21746cf9decf4c';
@@ -17,59 +16,59 @@ describe('RestApiDogeClient', () => {
 
   describe('getBlocksTipHash', () => {
     it('should return the latest block hash', async () => {
-      console.log(await client.getBlocksTipHash());
+      console.log(await testnetClient.getBlocksTipHash());
     });
   });
 
   describe('getBlockHeader', () => {
     it('should return the header of the block', async () => {
-      console.log(await client.getBlockHeader({ hash: testnetBlockHash }));
+      console.log(await testnetClient.getBlockHeader({ hash: testnetBlockHash }));
     });
   });
 
   describe('getBlockHeight', () => {
     it('should return the height of the block', async () => {
-      console.log(await client.getBlockHeight({ height: 0 }));
+      console.log(await testnetClient.getBlockHeight({ height: 0 }));
     });
   });
 
   describe('getBlockTxids', () => {
     it('should return the txids of the block', async () => {
-      console.log(await client.getBlockTxids({ hash: testnetBlockHash }));
+      console.log(await testnetClient.getBlockTxids({ hash: testnetBlockHash }));
     });
   });
 
   describe('getBlock', () => {
     it('should return the block', async () => {
-      console.log(await client.getBlock({ hash: testnetBlockHash }));
+      console.log(await testnetClient.getBlock({ hash: testnetBlockHash }));
     });
   });
 
   describe('getTxHex', () => {
     it('should return the hex of the transaction', async () => {
-      console.log(await client.getTxHex({ txId: testnetTxId }));
+      console.log(await testnetClient.getTxHex({ txId: testnetTxId }));
     });
   });
 
   describe('getTx', () => {
     it('should return the transaction', async () => {
-      console.log(await client.getTx({ txId: testnetTxId }));
+      console.log(await testnetClient.getTx({ txId: testnetTxId }));
     });
   });
 
   describe('getAddressTxs', () => {
     it('should return the transactions', async () => {
-      console.log(await client.getAddressTxs({ address: testnetAddress }));
+      console.log(await testnetClient.getAddressTxs({ address: testnetAddress }));
     });
   });
 
   describe('getAddressTxsUtxo', () => {
     it('should return the utxos', async () => {
-      console.log(await client.getAddressTxsUtxo({ address: testnetAddress }));
+      console.log(await testnetClient.getAddressTxsUtxo({ address: testnetAddress }));
     });
   });
 });
 
 /* 
-pnpm vitest run src/services/doge/restapi.test.ts -t "getBlocksTipHash"
+pnpm vitest run src/services/doge/restapi.test.ts -t "getBlock should return the block"
 */

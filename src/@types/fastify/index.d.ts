@@ -6,6 +6,7 @@ import CKBClient from '../../services/ckb';
 import BitcoinClient from '../../services/bitcoin';
 import RgbppCollector from '../../services/rgbpp';
 import UTXOSyncer from '../../services/utxo';
+import DogeClient from '../../services/doge';
 
 declare module 'fastify' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -19,5 +20,6 @@ declare module 'fastify' {
     transactionProcessor: TransactionProcessor;
     rgbppCollector: RgbppCollector;
     utxoSyncer: UTXOSyncer;
+    doge: DogeClient;
   }
 }

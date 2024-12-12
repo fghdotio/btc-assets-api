@@ -10,6 +10,7 @@ import CKBClient from './services/ckb';
 import BitcoinClient from './services/bitcoin';
 import RgbppCollector from './services/rgbpp';
 import UTXOSyncer from './services/utxo';
+import DogeClient from './services/doge';
 
 export interface Cradle {
   env: typeof env;
@@ -23,6 +24,7 @@ export interface Cradle {
   transactionProcessor: TransactionProcessor;
   rgbppCollector: RgbppCollector;
   utxoSyncer: UTXOSyncer;
+  doge: DogeClient;
 }
 
 const container = createContainer<Cradle>({
@@ -46,6 +48,7 @@ container.register({
   unlocker: asClass(Unlocker).singleton(),
   rgbppCollector: asClass(RgbppCollector).singleton(),
   utxoSyncer: asClass(UTXOSyncer).singleton(),
+  doge: asClass(DogeClient).singleton(),
 });
 
 export default container;
