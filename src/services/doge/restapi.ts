@@ -5,7 +5,7 @@ import { Block } from './interfaces';
 export const baseUrl = 'https://rest.cryptoapis.io/blockchain-data/dogecoin';
 
 // using cryptoapis.io endpoint
-export class RestApiDogeClient {
+export class DogeRestApiClient {
   private request: AxiosInstance;
   private baseUrl: string;
 

@@ -1,14 +1,14 @@
 import { describe, beforeEach, it } from 'vitest';
 import { DogeMemoryWalletProvider, createP2PKHTransaction } from 'doge-sdk';
 
-import { RestApiDogeClient } from './restapi';
+import { DogeRestApiClient } from './restapi';
 
-describe('RestApiDogeClient', () => {
-  let testnetClient: RestApiDogeClient;
+describe('DogeRestApiClient', () => {
+  let testnetClient: DogeRestApiClient;
   // dev Crypto APIs
 
   beforeEach(() => {
-    testnetClient = new RestApiDogeClient('testnet', process.env.DOGE_CRYPTO_APIS_API_KEY!);
+    testnetClient = new DogeRestApiClient('testnet', process.env.DOGE_CRYPTO_APIS_API_KEY!);
   });
 
   const testnetBlockHash: string = '577f016bbf165a905fc7778f89d3ccc5be04b5cfd1490004fa21746cf9decf4c';

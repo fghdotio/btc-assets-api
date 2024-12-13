@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { Cradle } from '../../container';
-import { RestApiDogeClient } from './restapi';
+import { DogeRestApiClient } from './restapi';
 import { IS_MAINNET, NetworkType } from '../../constants';
 import { Block } from './interfaces';
 
@@ -13,14 +13,14 @@ export default class DogeClient {
   constructor(cradle: Cradle) {
     this.cradle = cradle;
     const { env } = cradle;
-    this.source = new RestApiDogeClient(env.DOGE_NETWORK, env.DOGE_CRYPTO_APIS_API_KEY);
+    this.source = new DogeRestApiClient(env.DOGE_NETWORK, env.DOGE_CRYPTO_APIS_API_KEY);
 
     // TODO: add a fallback data source
-    this.fallback = new RestApiDogeClient(env.DOGE_NETWORK, env.DOGE_CRYPTO_APIS_API_KEY);
+    this.fallback = new DogeRestApiClient(env.DOGE_NETWORK, env.DOGE_CRYPTO_APIS_API_KEY);
   }
 
   private async call<T, Args extends Record<string, unknown> = Record<string, unknown>>(
-    method: keyof RestApiDogeClient,
+    method: keyof DogeRestApiClient,
     args?: Args,
   ): Promise<T> {
     try {
