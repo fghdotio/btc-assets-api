@@ -95,9 +95,15 @@ describe('DogeRpcClient', () => {
       console.log(await testnetRpcClient.getBlocksTipHash());
     });
   });
+
+  describe('getFeesRecommended', () => {
+    it('should return the recommended fees', async () => {
+      console.log(await testnetRpcClient.getFeesRecommended());
+    });
+  });
 });
 
 /* 
 pnpm vitest run src/services/doge/rpc.test.ts
-pnpm vitest run src/services/doge/rpc.test.ts -t "postTx"
+pnpm vitest run src/services/doge/rpc.test.ts -t "getFeesRecommended"
 */

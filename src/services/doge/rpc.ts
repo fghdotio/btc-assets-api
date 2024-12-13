@@ -52,6 +52,27 @@ export class DogeRpcClient {
     return response.data.result;
   }
 
+  /** Estimate fee rate needed to get into the next nBlocks */
+  public async getFeesRecommended() {
+    interface GetFeesRecommendedResponse {
+      result: number;
+    }
+    const BLOCKS_TO_PRIORITY: Record<number, 'fast' | 'medium' | 'slow'> = {
+      2: 'fast',
+      5: 'medium',
+      15: 'slow',
+    };
+
+    const nBlocks = Object.keys(BLOCKS_TO_PRIORITY).map(Number);
+    const responses = await Promise.all(
+      nBlocks.map((n) => this.request.post<GetFeesRecommendedResponse>('/', this.rpcReq('estimatefee', [n]))),
+    );
+
+    return Object.fromEntries(
+      responses.map((response, index) => [BLOCKS_TO_PRIORITY[nBlocks[index]], response.data.result]),
+    );
+  }
+
   // public async getAddressTxsUtxo({ _address }: { _address: string }) {
   //   throw new Error('Not supported');
   // }
