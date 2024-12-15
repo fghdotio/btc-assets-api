@@ -7,6 +7,11 @@ export enum NetworkType {
   signet = 'signet',
 }
 
+export enum DogecoinNetworkType {
+  mainnet = 'mainnet',
+  testnet = 'testnet',
+}
+
 export const TestnetTypeMap: Record<NetworkType, BTCTestnetType | undefined> = {
   [NetworkType.mainnet]: undefined,
   [NetworkType.testnet]: 'Testnet3',

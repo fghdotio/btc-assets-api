@@ -7,7 +7,7 @@ import { Job, RepeatOptions } from 'bullmq';
 import * as Sentry from '@sentry/node';
 import DataCache from './base/data-cache';
 import { throttle } from 'lodash';
-import validateBitcoinAddress from '../utils/validators';
+import { validateBitcoinAddress } from '../utils/validators';
 
 interface IUTXOSyncRequest {
   btcAddress: string;
