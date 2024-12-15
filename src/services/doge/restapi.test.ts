@@ -27,9 +27,9 @@ describe('DogeRestApiClient', () => {
         throw new Error('No utxos found');
       }
       const formattedUtxo = {
-        txid: utxos[2].transactionId,
-        vout: utxos[2].index,
-        value: parseFloat(utxos[2].amount) * 10 ** 8,
+        txid: utxos[0].txid,
+        vout: utxos[0].vout,
+        value: utxos[0].value * 10 ** 8,
       };
       console.log(utxos.length, formattedUtxo);
 
@@ -104,6 +104,6 @@ describe('DogeRestApiClient', () => {
 });
 
 /* 
-pnpm vitest run src/services/doge/restapi.test.ts -t "postTx"
+pnpm vitest run src/services/doge/restapi.test.ts -t "getAddressTxsUtxo"
 pnpm vitest run src/services/doge/restapi.test.ts -t "getAddressTxs should return the transactions"
 */

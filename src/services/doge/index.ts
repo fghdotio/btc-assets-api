@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { Cradle } from '../../container';
 import { DogeRestApiClient } from './restapi';
 import { IS_MAINNET, NetworkType } from '../../constants';
-import { Block } from './interfaces';
+import { Block, UTXO, Transaction } from './schema';
 
 export default class DogeClient {
   private cradle: Cradle;
@@ -84,11 +84,17 @@ export default class DogeClient {
     return txid;
   }
 
-  public async getAddressTxsUtxo({ address }: { address: string }) {
+  public async getAddressTxsUtxo({ address }: { address: string }): Promise<z.infer<typeof UTXO>[]> {
     return this.call('getAddressTxsUtxo', { address });
   }
 
-  public async getAddressTxs({ address, after_txid }: { address: string; after_txid?: string }) {
+  public async getAddressTxs({
+    address,
+    after_txid,
+  }: {
+    address: string;
+    after_txid?: string;
+  }): Promise<z.infer<typeof Transaction>[]> {
     return this.call('getAddressTxs', { address, after_txid });
   }
 

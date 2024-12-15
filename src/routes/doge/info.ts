@@ -1,6 +1,6 @@
 import { FastifyPluginCallback } from 'fastify';
 import { Server } from 'http';
-import { ChainInfo } from '../../services/doge/interfaces';
+import { ChainInfo } from '../../services/doge/schema';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 
 const infoRoute: FastifyPluginCallback<Record<never, never>, Server, ZodTypeProvider> = (fastify, _, done) => {

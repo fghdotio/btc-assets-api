@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
+import { z } from 'zod';
 
-import { Block } from './interfaces';
+import { Block, Status, UTXO, Transaction } from './schema';
 
 export const baseUrl = 'https://rest.cryptoapis.io/blockchain-data/dogecoin';
 
@@ -54,7 +55,7 @@ export class DogeRestApiClient {
 
   // https://developers.cryptoapis.io/v-1.2023-04-25-105/RESTapis/unified-endpoints/list-unspent-transaction-outputs-by-address/get
   // default limit is 10
-  public async getAddressTxsUtxo({ address }: { address: string }) {
+  public async getAddressTxsUtxo({ address }: { address: string }): Promise<z.infer<typeof UTXO>[]> {
     type AddressTxsUtxoResponse = {
       data: {
         limit: number;
@@ -73,7 +74,19 @@ export class DogeRestApiClient {
     };
     const response = await this.request.get<AddressTxsUtxoResponse>(`/addresses/${address}/unspent-outputs`);
     // console.log(response.data.data);
-    return response.data.data.items;
+
+    const utxos = response.data.data.items.map((item) => {
+      return UTXO.parse({
+        txid: item.transactionId,
+        vout: item.index,
+        value: parseInt(item.amount, 10),
+        status: Status.parse({
+          confirmed: item.isConfirmed,
+        }),
+      });
+    });
+
+    return utxos;
   }
 
   // https://developers.cryptoapis.io/v-1.2023-04-25-105/RESTapis/unified-endpoints/list-unconfirmed-transactions-by-address/get
@@ -81,7 +94,12 @@ export class DogeRestApiClient {
   // Dogecoin Testnet Faucet: https://shibe.technology/
   // bitcoin: Get transaction history for the specified address/scripthash, sorted with newest first. Returns up to 50 mempool transactions plus the first 25 confirmed transactions.
   // TODO: You can request more confirmed transactions using an after_txid query parameter.
-  public async getAddressTxs({ address }: { address: string; after_txid?: string }) {
+  public async getAddressTxs({
+    address,
+  }: {
+    address: string;
+    after_txid?: string;
+  }): Promise<z.infer<typeof Transaction>[]> {
     type AddressTxsResponse = {
       data: {
         limit: number;
@@ -90,6 +108,10 @@ export class DogeRestApiClient {
         items: [
           {
             timestamp: number;
+            transactionId: string;
+            transactionHash: string;
+            minedInBlockHash: string;
+            minedInBlockHeight: string;
           },
         ];
       };
@@ -104,7 +126,17 @@ export class DogeRestApiClient {
     // merge the two responses, sort by timestamp
     const merged = [...unconfirmedRes.data.data.items, ...confirmedRes.data.data.items];
     merged.sort((a, b) => b.timestamp - a.timestamp);
-    return merged;
+
+    const transactions = merged.map((item) => {
+      return Transaction.parse({
+        txid: item.transactionId || item.transactionHash,
+        status: Status.parse({
+          confirmed: item.minedInBlockHash !== null && item.minedInBlockHeight !== null,
+        }),
+      });
+    });
+
+    return transactions;
   }
 
   // https://developers.cryptoapis.io/v-1.2023-04-25-105/RESTapis/unified-endpoints/get-transaction-details-by-transaction-id/get
