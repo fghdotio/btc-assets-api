@@ -1,6 +1,6 @@
 import { FastifyPluginCallback } from 'fastify';
 import { Server } from 'http';
-import validateBitcoinAddress from '../../utils/validators';
+import { validateBitcoinAddress } from '../../utils/validators';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { CKBTransaction, Cell, IsomorphicTransaction, Script, XUDTBalance } from './types';
 import z from 'zod';

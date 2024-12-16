@@ -1,7 +1,7 @@
 import { FastifyPluginCallback } from 'fastify';
 import { Server } from 'http';
 import { Balance, Transaction, UTXO } from './types';
-import validateBitcoinAddress from '../../utils/validators';
+import { validateBitcoinAddress } from '../../utils/validators';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import z from 'zod';
 import { Env } from '../../env';
