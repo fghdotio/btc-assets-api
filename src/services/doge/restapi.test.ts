@@ -92,7 +92,11 @@ describe('DogeRestApiClient', () => {
 
   describe('getAddressTxs', () => {
     it('should return the transactions', async () => {
-      console.log(await testnetClient.getAddressTxs({ address: testnetAddress }));
+      const txs = await testnetClient.getAddressTxs({ address: testnetAddress });
+      console.log(txs);
+      txs.forEach((tx) => {
+        console.log(tx.vout);
+      });
     });
   });
 

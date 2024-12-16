@@ -50,11 +50,12 @@ const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
 
       const rgbppUtxoCellsPairs = await fastify.rgbppCollector.getRgbppUtxoCellsPairs(
         address,
+        CoinType.BTC,
         utxos,
         no_cache === 'true',
       );
       if (env.RGBPP_COLLECT_DATA_CACHE_ENABLE) {
-        await fastify.rgbppCollector.enqueueCollectJob(address);
+        await fastify.rgbppCollector.enqueueCollectJob(address, CoinType.BTC);
       }
 
       const rgbppUtxoMap = rgbppUtxoCellsPairs.reduce((map, { utxo }) => {
@@ -138,10 +139,10 @@ const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
 
       const rgbppUtxoCellsPairs =
         only_non_rgbpp_utxos === 'true'
-          ? await fastify.rgbppCollector.getRgbppUtxoCellsPairs(address, utxos, no_cache === 'true')
+          ? await fastify.rgbppCollector.getRgbppUtxoCellsPairs(address, CoinType.BTC, utxos, no_cache === 'true')
           : [];
       if (env.RGBPP_COLLECT_DATA_CACHE_ENABLE) {
-        await fastify.rgbppCollector.enqueueCollectJob(address);
+        await fastify.rgbppCollector.enqueueCollectJob(address, CoinType.BTC);
       }
       const rgbppUtxoSet = new Set(rgbppUtxoCellsPairs.map((pair) => pair.utxo.txid + ':' + pair.utxo.vout));
 

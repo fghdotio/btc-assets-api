@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { z } from 'zod';
 
-import { Block, Status, UTXO, Transaction } from './schema';
+import { Block, Status, UTXO, Transaction, Output } from './schema';
 
 export const baseUrl = 'https://rest.cryptoapis.io/blockchain-data/dogecoin';
 
@@ -112,6 +112,17 @@ export class DogeRestApiClient {
             transactionHash: string;
             minedInBlockHash: string;
             minedInBlockHeight: string;
+            blockchainSpecific: {
+              vout: {
+                scriptPubKey: {
+                  addresses: string[];
+                  asm: string;
+                  hex: string;
+                  type: string;
+                };
+                value: string;
+              }[];
+            };
           },
         ];
       };
@@ -130,6 +141,15 @@ export class DogeRestApiClient {
     const transactions = merged.map((item) => {
       return Transaction.parse({
         txid: item.transactionId || item.transactionHash,
+        vout: item.blockchainSpecific.vout.map((vout) => {
+          return Output.parse({
+            scriptpubkey: vout.scriptPubKey.hex,
+            scriptpubkey_asm: vout.scriptPubKey.asm,
+            scriptpubkey_type: vout.scriptPubKey.type,
+            scriptpubkey_address: vout.scriptPubKey.addresses.length > 0 ? vout.scriptPubKey.addresses[0] : undefined,
+            value: parseFloat(vout.value),
+          });
+        }),
         status: Status.parse({
           confirmed: item.minedInBlockHash !== null && item.minedInBlockHeight !== null,
         }),

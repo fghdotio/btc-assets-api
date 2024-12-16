@@ -33,27 +33,26 @@ const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
   /**
    * Get UTXOs by btc address
    */
-  async function getUtxos(btc_address: string, no_cache?: string) {
-    // !!! FIXME: hard code the coin type for now
-    const utxos = await fastify.utxoSyncer.getUtxosByAddress(btc_address, CoinType.BTC, no_cache === 'true');
+  async function getUtxos(address: string, coinType: CoinType, no_cache?: string) {
+    const utxos = await fastify.utxoSyncer.getUtxosByAddress(address, coinType, no_cache === 'true');
     if (env.UTXO_SYNC_DATA_CACHE_ENABLE) {
-      // !!! FIXME: hard code the coin type for now
-      await fastify.utxoSyncer.enqueueSyncJob(btc_address, CoinType.BTC);
+      await fastify.utxoSyncer.enqueueSyncJob(address, coinType);
     }
     return utxos;
   }
 
   /**
-   * Get RGB++ assets by btc address
+   * Get RGB++ assets by coinType and address
    */
-  async function getRgbppAssetsCells(btc_address: string, utxos: UTXO[], no_cache?: string) {
+  async function getRgbppAssetsCells(address: string, coinType: CoinType, utxos: UTXO[], no_cache?: string) {
     const rgbppUtxoCellsPairs = await fastify.rgbppCollector.getRgbppUtxoCellsPairs(
-      btc_address,
+      address,
+      coinType,
       utxos,
       no_cache === 'true',
     );
     if (env.RGBPP_COLLECT_DATA_CACHE_ENABLE) {
-      await fastify.rgbppCollector.enqueueCollectJob(btc_address);
+      await fastify.rgbppCollector.enqueueCollectJob(address, coinType);
     }
     const cells = rgbppUtxoCellsPairs.map((pair) => pair.cells).flat();
     return cells;
@@ -67,15 +66,16 @@ const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
   }
 
   fastify.get(
-    '/:btc_address/assets',
+    '/:address/assets',
     {
       schema: {
-        description: 'Get RGB++ assets by btc address',
+        description: 'Get RGB++ assets by coinType and address',
         tags: ['RGB++'],
         params: z.object({
-          btc_address: z.string(),
+          address: z.string(),
         }),
         querystring: z.object({
+          coin_type: z.nativeEnum(CoinType).default(CoinType.BTC),
           type_script: Script.or(z.string())
             .optional()
             .describe(
@@ -98,10 +98,10 @@ const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
       },
     },
     async (request) => {
-      const { btc_address } = request.params;
-      const { no_cache } = request.query;
-      const utxos = await getUtxos(btc_address, no_cache);
-      const cells = await getRgbppAssetsCells(btc_address, utxos, no_cache);
+      const { address } = request.params;
+      const { coin_type, no_cache } = request.query;
+      const utxos = await getUtxos(address, coin_type, no_cache);
+      const cells = await getRgbppAssetsCells(address, coin_type, utxos, no_cache);
       const typeScript = getTypeScript(request.query.type_script);
       const assetCells = typeScript ? filterCellsByTypeScript(cells, typeScript) : cells;
       return assetCells.map((cell) => {
@@ -115,20 +115,21 @@ const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
   );
 
   fastify.get(
-    '/:btc_address/balance',
+    '/:address/balance',
     {
       schema: {
         description: `
-          Get RGB++ balance by btc address, support xUDT only for now. 
+          Get RGB++ balance by BTC/DOGE address, support xUDT only for now. 
           
-          An address with more than 50 pending BTC transactions is uncommon. 
+          An address with more than 50 pending transactions is uncommon. 
           However, if such a situation arises, it potentially affecting the returned total_amount.
         `,
         tags: ['RGB++'],
         params: z.object({
-          btc_address: z.string(),
+          address: z.string(),
         }),
         querystring: z.object({
+          coin_type: z.nativeEnum(CoinType).default(CoinType.BTC),
           type_script: Script.or(z.string())
             .describe(
               `
@@ -154,8 +155,8 @@ const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
       },
     },
     async (request) => {
-      const { btc_address } = request.params;
-      const { no_cache } = request.query;
+      const { address } = request.params;
+      const { coin_type, no_cache } = request.query;
 
       const typeScript = getTypeScript(request.query.type_script);
       if (!typeScript || !isTypeAssetSupported(typeScript, IS_MAINNET)) {
@@ -167,11 +168,11 @@ const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
       }
 
       const xudtBalances: Record<string, XUDTBalance> = {};
-      const utxos = await getUtxos(btc_address, no_cache);
+      const utxos = await getUtxos(address, coin_type, no_cache);
 
       // Find confirmed RgbppLock XUDT assets
       const confirmedUtxos = utxos.filter((utxo) => utxo.status.confirmed);
-      const confirmedCells = await getRgbppAssetsCells(btc_address, confirmedUtxos, no_cache);
+      const confirmedCells = await getRgbppAssetsCells(address, coin_type, confirmedUtxos, no_cache);
       const confirmedTargetCells = filterCellsByTypeScript(confirmedCells, typeScript);
       const availableXudtBalances = await fastify.rgbppCollector.getRgbppBalanceByCells(confirmedTargetCells);
       Object.keys(availableXudtBalances).forEach((key) => {
@@ -220,7 +221,25 @@ const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
 
       // Find spent RgbppLock XUDT assets in the inputs of the unconfirmed transactions
       // XXX: the bitcoin.getAddressTxs() API only returns up to 50 mempool transactions
-      const latestTxs = await fastify.bitcoin.getAddressTxs({ address: btc_address });
+      let latestTxs: {
+        status: { confirmed: boolean };
+        txid: string;
+        vout: {
+          value: number;
+          scriptpubkey: string;
+          scriptpubkey_asm: string;
+          scriptpubkey_type: string;
+          scriptpubkey_address?: string | undefined;
+        }[];
+      }[];
+      switch (coin_type) {
+        case CoinType.BTC:
+          latestTxs = await fastify.bitcoin.getAddressTxs({ address });
+          break;
+        case CoinType.DOGE:
+          latestTxs = await fastify.doge.getAddressTxs({ address });
+          break;
+      }
       const unconfirmedTxids = latestTxs.filter((tx) => !tx.status.confirmed).map((tx) => tx.txid);
       const spendingInputCellsGroup = await Promise.all(
         unconfirmedTxids.map(async (txid) => {
@@ -243,7 +262,7 @@ const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
             const lockArgs = inputCellLockArgs[index];
             const tx = txsMap[remove0x(lockArgs.btcTxid)];
             const utxo = tx?.vout[lockArgs.outIndex];
-            return utxo?.scriptpubkey_address === btc_address;
+            return utxo?.scriptpubkey_address === address;
           });
         }),
       );
@@ -266,7 +285,7 @@ const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
       });
 
       return {
-        address: btc_address,
+        address: address,
         xudt: Object.values(xudtBalances),
       };
     },

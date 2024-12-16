@@ -36,7 +36,8 @@ export type RgbppUtxoCellsPair = {
 };
 
 interface IRgbppCollectRequest {
-  btcAddress: string;
+  address: string;
+  coinType: CoinType;
 }
 
 interface IRgbppCollectJobReturn {
@@ -85,15 +86,20 @@ export default class RgbppCollector extends BaseQueueWorker<IRgbppCollectRequest
     this.limit = pLimit(100);
   }
 
+  static cacheKey(address: string, coinType: CoinType) {
+    return `${coinType}_${address}`;
+  }
+
   /**
    * Capture the exception to the sentry scope with the btc address and utxos
    * @param job - the job that failed
    * @param err - the error
    */
   private captureJobExceptionToSentryScope(job: Job<IRgbppCollectRequest>, err: Error) {
-    const { btcAddress } = job.data;
+    const { address, coinType } = job.data;
     Sentry.withScope((scope) => {
-      scope.setTag('btcAddress', btcAddress);
+      scope.setTag('coinType', coinType);
+      scope.setTag('address', address);
       this.cradle.logger.error(err);
       scope.captureException(err);
     });
@@ -101,16 +107,16 @@ export default class RgbppCollector extends BaseQueueWorker<IRgbppCollectRequest
 
   /**
    * Save the rgbpp utxo cells pairs to the cache
-   * @param btcAddress - the btc address
+   * @param cacheKey - coinType_address
    * @param pairs - the rgbpp utxo cells pairs
    */
-  private async saveRgbppUtxoCellsPairsToCache(btcAddress: string, pairs: RgbppUtxoCellsPair[]) {
+  private async saveRgbppUtxoCellsPairsToCache(cacheKey: string, pairs: RgbppUtxoCellsPair[]) {
     const data = pairs.reduce((acc, { utxo, cells }) => {
       const key = `${utxo.txid}:${utxo.vout}`;
       acc[key] = cells;
       return acc;
     }, {} as IRgbppCollectJobReturn);
-    this.dataCache.set(btcAddress, data);
+    this.dataCache.set(cacheKey, data);
     return data;
   }
 
@@ -191,9 +197,9 @@ export default class RgbppCollector extends BaseQueueWorker<IRgbppCollectRequest
   /**
    * Get the rgbpp utxo cells pairs
    */
-  public async getRgbppUtxoCellsPairs(btcAddress: string, utxos: UTXO[], noCache?: boolean) {
+  public async getRgbppUtxoCellsPairs(address: string, coinType: CoinType, utxos: UTXO[], noCache?: boolean) {
     if (this.cradle.env.RGBPP_COLLECT_DATA_CACHE_ENABLE && !noCache) {
-      const cached = await this.dataCache.get(btcAddress);
+      const cached = await this.dataCache.get(RgbppCollector.cacheKey(address, coinType));
       if (cached) {
         const pairs = utxos
           .map((utxo) => {
@@ -205,7 +211,7 @@ export default class RgbppCollector extends BaseQueueWorker<IRgbppCollectRequest
       }
     }
     const pairs = await this.collectRgbppUtxoCellsPairs(utxos);
-    await this.saveRgbppUtxoCellsPairsToCache(btcAddress, pairs);
+    await this.saveRgbppUtxoCellsPairsToCache(RgbppCollector.cacheKey(address, coinType), pairs);
     return pairs;
   }
 
@@ -389,16 +395,20 @@ export default class RgbppCollector extends BaseQueueWorker<IRgbppCollectRequest
   /**
    * Enqueue a collect job to the queue
    */
-  public async enqueueCollectJob(btcAddress: string, allowDuplicate?: boolean): Promise<Job<IRgbppCollectRequest>> {
-    let jobId = btcAddress;
+  public async enqueueCollectJob(
+    address: string,
+    coinType: CoinType,
+    allowDuplicate?: boolean,
+  ): Promise<Job<IRgbppCollectRequest>> {
+    let jobId = RgbppCollector.cacheKey(address, coinType);
     if (allowDuplicate) {
       // add a timestamp to the job id to allow duplicate jobs
       // used for the case that the utxos are updated
-      jobId = `${btcAddress}:${Date.now()}`;
+      jobId = `${jobId}:${Date.now()}`;
     }
     return this.addJob(
       jobId,
-      { btcAddress },
+      { address, coinType },
       {
         removeOnComplete: true,
         removeOnFail: true,
@@ -413,11 +423,10 @@ export default class RgbppCollector extends BaseQueueWorker<IRgbppCollectRequest
    */
   public async process(job: Job<IRgbppCollectRequest>) {
     try {
-      const { btcAddress } = job.data;
-      // !!! FIXME: hard code the coin type for now
-      const utxos = await this.cradle.utxoSyncer.getUtxosByAddress(btcAddress, CoinType.BTC);
+      const { address, coinType } = job.data;
+      const utxos = await this.cradle.utxoSyncer.getUtxosByAddress(address, coinType);
       const pairs = await this.collectRgbppUtxoCellsPairs(utxos);
-      await this.saveRgbppUtxoCellsPairsToCache(btcAddress, pairs);
+      await this.saveRgbppUtxoCellsPairsToCache(RgbppCollector.cacheKey(address, coinType), pairs);
     } catch (e) {
       const { message, stack } = e as Error;
       const error = new RgbppCollectorError(message);

@@ -38,8 +38,18 @@ export const UTXO = z.object({
   status: Status,
 });
 
+export const Output = z.object({
+  scriptpubkey: z.string(),
+  scriptpubkey_asm: z.string(),
+  scriptpubkey_type: z.string(),
+  scriptpubkey_address: z.string().optional(),
+  value: z.number(),
+});
+
 export const Transaction = z.object({
   txid: z.string(),
   status: Status,
+  vout: z.array(Output),
+
   // TODO: add more fields
 });
