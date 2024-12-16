@@ -1,5 +1,6 @@
 import { FastifyPluginCallback } from 'fastify';
 import { Server } from 'http';
+
 import z from 'zod';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 

@@ -5,6 +5,7 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import infoRoute from './info';
 import blockRoutes from './block';
 import transactionRoutes from './transaction';
+import addressRoutes from './address';
 import DogeClient from '../../services/doge';
 import container from '../../container';
 
@@ -14,6 +15,7 @@ const dogeRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodTypePro
   fastify.register(infoRoute);
   fastify.register(blockRoutes, { prefix: '/block' });
   fastify.register(transactionRoutes, { prefix: '/transaction' });
+  fastify.register(addressRoutes, { prefix: '/address' });
 
   done();
 };
