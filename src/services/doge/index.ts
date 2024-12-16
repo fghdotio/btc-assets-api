@@ -79,8 +79,8 @@ export default class DogeClient {
     return this.call('getFeesRecommended');
   }
 
-  public async postTx({ txhex }: { txhex: string }) {
-    const txid = await this.call('postTx', { txhex });
+  public async postTx({ txhex }: { txhex: string }): Promise<string> {
+    const txid = await this.call<string>('postTx', { txHex: txhex });
     return txid;
   }
 
