@@ -25,7 +25,7 @@ import { Cradle } from '../container';
 import { isCommitmentMatchToCkbTx, tryGetCommitmentFromBtcTx } from '../utils/commitment';
 import { getRgbppLock, isBtcTimeLock, isRgbppLock } from '../utils/lockscript';
 import { IS_MAINNET, TESTNET_TYPE } from '../constants';
-
+import { CoinType } from '../constants';
 type GetCellsParams = Parameters<RPC['getCells']>;
 export type SearchKey = GetCellsParams[0];
 export type CKBBatchRequest = { exec: () => Promise<{ objects: IndexerCell[] }[]> };
@@ -414,7 +414,8 @@ export default class RgbppCollector extends BaseQueueWorker<IRgbppCollectRequest
   public async process(job: Job<IRgbppCollectRequest>) {
     try {
       const { btcAddress } = job.data;
-      const utxos = await this.cradle.utxoSyncer.getUtxosByAddress(btcAddress);
+      // !!! FIXME: hard code the coin type for now
+      const utxos = await this.cradle.utxoSyncer.getUtxosByAddress(btcAddress, CoinType.BTC);
       const pairs = await this.collectRgbppUtxoCellsPairs(utxos);
       await this.saveRgbppUtxoCellsPairsToCache(btcAddress, pairs);
     } catch (e) {

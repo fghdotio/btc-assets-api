@@ -5,6 +5,7 @@ import { validateBitcoinAddress } from '../../utils/validators';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import z from 'zod';
 import { Env } from '../../env';
+import { CoinType } from '../../constants';
 
 const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodTypeProvider> = (fastify, _, done) => {
   const env: Env = fastify.container.resolve('env');
@@ -42,9 +43,9 @@ const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
       const { address } = request.params;
       const { min_satoshi, no_cache } = request.query;
 
-      const utxos = await fastify.utxoSyncer.getUtxosByAddress(address, no_cache === 'true');
+      const utxos = await fastify.utxoSyncer.getUtxosByAddress(address, CoinType.BTC, no_cache === 'true');
       if (env.UTXO_SYNC_DATA_CACHE_ENABLE) {
-        await fastify.utxoSyncer.enqueueSyncJob(address);
+        await fastify.utxoSyncer.enqueueSyncJob(address, CoinType.BTC);
       }
 
       const rgbppUtxoCellsPairs = await fastify.rgbppCollector.getRgbppUtxoCellsPairs(
@@ -130,9 +131,9 @@ const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
       const { address } = request.params;
       const { only_confirmed, min_satoshi, only_non_rgbpp_utxos, no_cache } = request.query;
 
-      const utxos = await fastify.utxoSyncer.getUtxosByAddress(address, no_cache === 'true');
+      const utxos = await fastify.utxoSyncer.getUtxosByAddress(address, CoinType.BTC, no_cache === 'true');
       if (env.UTXO_SYNC_DATA_CACHE_ENABLE) {
-        await fastify.utxoSyncer.enqueueSyncJob(address);
+        await fastify.utxoSyncer.enqueueSyncJob(address, CoinType.BTC);
       }
 
       const rgbppUtxoCellsPairs =

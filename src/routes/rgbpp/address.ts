@@ -17,6 +17,7 @@ import { unpackRgbppLockArgs } from '@rgbpp-sdk/btc/lib/ckb/molecule';
 import { remove0x } from '@rgbpp-sdk/btc';
 import { isRgbppLock } from '../../utils/lockscript';
 import { IS_MAINNET } from '../../constants';
+import { CoinType } from '../../constants';
 
 const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodTypeProvider> = (fastify, _, done) => {
   const env: Env = fastify.container.resolve('env');
@@ -33,9 +34,11 @@ const addressRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodType
    * Get UTXOs by btc address
    */
   async function getUtxos(btc_address: string, no_cache?: string) {
-    const utxos = await fastify.utxoSyncer.getUtxosByAddress(btc_address, no_cache === 'true');
+    // !!! FIXME: hard code the coin type for now
+    const utxos = await fastify.utxoSyncer.getUtxosByAddress(btc_address, CoinType.BTC, no_cache === 'true');
     if (env.UTXO_SYNC_DATA_CACHE_ENABLE) {
-      await fastify.utxoSyncer.enqueueSyncJob(btc_address);
+      // !!! FIXME: hard code the coin type for now
+      await fastify.utxoSyncer.enqueueSyncJob(btc_address, CoinType.BTC);
     }
     return utxos;
   }

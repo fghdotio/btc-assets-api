@@ -38,6 +38,7 @@ import { Env } from '../env';
 import { getCommitmentFromBtcTx } from '../utils/commitment';
 import { isBtcTimeLock, isRgbppLock } from '../utils/lockscript';
 import { IS_MAINNET } from '../constants';
+import { CoinType } from '../constants';
 
 export interface ITransactionRequest {
   txid: string;
@@ -446,7 +447,10 @@ export default class TransactionProcessor
         if (this.cradle.env.UTXO_SYNC_DATA_CACHE_ENABLE) {
           try {
             const addresses = btcTx.vout.map((vout) => vout.scriptpubkey_address).filter((address) => address);
-            await Promise.all(addresses.map((address) => this.cradle.utxoSyncer.enqueueSyncJob(address!)));
+            await Promise.all(
+              // !!! FIXME: hard code the coin type for now
+              addresses.map((address) => this.cradle.utxoSyncer.enqueueSyncJob(address!, CoinType.BTC)),
+            );
           } catch (err) {
             // ignore the error if enqueue sync job failed, to avoid the transaction failed
             // already catch the error inside the utxo syncer

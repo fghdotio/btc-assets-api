@@ -5,7 +5,7 @@ import SPVClient from '../../services/spv';
 import CKBClient from '../../services/ckb';
 import BitcoinClient from '../../services/bitcoin';
 import RgbppCollector from '../../services/rgbpp';
-import UTXOSyncer from '../../services/utxo';
+import UTXOSyncer2 from '../../services/utxo2';
 import DogeClient from '../../services/doge';
 
 declare module 'fastify' {
@@ -19,7 +19,7 @@ declare module 'fastify' {
     paymaster: Paymaster;
     transactionProcessor: TransactionProcessor;
     rgbppCollector: RgbppCollector;
-    utxoSyncer: UTXOSyncer;
+    utxoSyncer: UTXOSyncer2;
     doge: DogeClient;
   }
 }

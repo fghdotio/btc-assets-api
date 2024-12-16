@@ -4,7 +4,7 @@ import cron from 'fastify-cron';
 import { Env } from '../env';
 import Unlocker from '../services/unlocker';
 import RgbppCollector from '../services/rgbpp';
-import UTXOSyncer from '../services/utxo';
+import UTXOSyncer2 from '../services/utxo2';
 
 export default fp(async (fastify) => {
   try {
@@ -81,18 +81,18 @@ export default fp(async (fastify) => {
     };
 
     if (env.UTXO_SYNC_DATA_CACHE_ENABLE) {
-      const utxoSyncer: UTXOSyncer = fastify.container.resolve('utxoSyncer');
+      const utxoSyncer: UTXOSyncer2 = fastify.container.resolve('utxoSyncer');
       fastify.addHook('onReady', async () => {
         utxoSyncer.startProcess({
           onActive: (job) => {
-            fastify.log.info(`[UTXOSyncer] job active: ${job.id}`);
+            fastify.log.info(`[UTXOSyncer2] job active: ${job.id}`);
           },
           onCompleted: async (job) => {
-            fastify.log.info(`[UTXOSyncer] job completed: ${job.id}`);
+            fastify.log.info(`[UTXOSyncer2] job completed: ${job.id}`);
             if (env.RGBPP_COLLECT_DATA_CACHE_ENABLE) {
-              const { btcAddress } = job.data;
+              const { address } = job.data;
               const rgbppCollector: RgbppCollector = fastify.container.resolve('rgbppCollector');
-              await rgbppCollector.enqueueCollectJob(btcAddress, true);
+              await rgbppCollector.enqueueCollectJob(address, true);
             }
           },
         });

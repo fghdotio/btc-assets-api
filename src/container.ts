@@ -9,7 +9,7 @@ import SPVClient from './services/spv';
 import CKBClient from './services/ckb';
 import BitcoinClient from './services/bitcoin';
 import RgbppCollector from './services/rgbpp';
-import UTXOSyncer from './services/utxo';
+import UTXOSyncer2 from './services/utxo2';
 import DogeClient from './services/doge';
 
 export interface Cradle {
@@ -23,7 +23,7 @@ export interface Cradle {
   unlocker: Unlocker;
   transactionProcessor: TransactionProcessor;
   rgbppCollector: RgbppCollector;
-  utxoSyncer: UTXOSyncer;
+  utxoSyncer: UTXOSyncer2;
   doge: DogeClient;
 }
 
@@ -47,7 +47,7 @@ container.register({
   transactionProcessor: asClass(TransactionProcessor).singleton(),
   unlocker: asClass(Unlocker).singleton(),
   rgbppCollector: asClass(RgbppCollector).singleton(),
-  utxoSyncer: asClass(UTXOSyncer).singleton(),
+  utxoSyncer: asClass(UTXOSyncer2).singleton(),
   doge: asClass(DogeClient).singleton(),
 });
 
