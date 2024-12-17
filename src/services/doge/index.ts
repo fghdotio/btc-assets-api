@@ -98,11 +98,11 @@ export default class DogeClient {
     return this.call('getAddressTxs', { address, after_txid });
   }
 
-  public async getTx({ txid }: { txid: string }) {
+  public async getTx({ txid }: { txid: string }): Promise<z.infer<typeof Transaction>> {
     return this.call('getTx', { txid });
   }
 
-  public async getTxHex({ txid }: { txid: string }) {
+  public async getTxHex({ txid }: { txid: string }): Promise<string> {
     return this.call('getTxHex', { txid });
   }
 

@@ -82,14 +82,14 @@ describe('DogeRestApiClient', () => {
 
   describe('getTxHex', () => {
     it('should return the hex of the transaction', async () => {
-      console.log(await testnetClient.getTxHex({ txId: testnetTxId }));
+      console.log(await testnetClient.getTxHex({ txid: testnetTxId }));
     });
   });
 
   describe('getTx', () => {
     it('should return the transaction', async () => {
-      console.log(await testnetClient.getTx({ txId: testnetTxId }));
-      console.log(await testnetClient.getTx({ txId: testnetCoinbaseTxId }));
+      console.log(await testnetClient.getTx({ txid: testnetTxId }));
+      console.log(await testnetClient.getTx({ txid: testnetCoinbaseTxId }));
     });
   });
 

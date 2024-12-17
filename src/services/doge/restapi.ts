@@ -202,13 +202,13 @@ export class DogeRestApiClient {
   }
 
   // https://developers.cryptoapis.io/v-1.2023-04-25-105/RESTapis/unified-endpoints/get-transaction-details-by-transaction-id/get
-  public async getTx({ txId }: { txId: string }) {
+  public async getTx({ txid }: { txid: string }) {
     interface TxResponse {
       data: {
         item: TxInResponse;
       };
     }
-    const response = await this.request.get<TxResponse>(`/transactions/${txId}`);
+    const response = await this.request.get<TxResponse>(`/transactions/${txid}`);
     // console.log(response.data.data.item);
     const {
       isConfirmed,
@@ -253,7 +253,7 @@ export class DogeRestApiClient {
   }
 
   // https://developers.cryptoapis.io/v-1.2023-04-25-105/RESTapis/unified-endpoints/get-raw-transaction-data/get
-  public async getTxHex({ txId }: { txId: string }) {
+  public async getTxHex({ txid }: { txid: string }) {
     interface TxHexResponse {
       data: {
         item: {
@@ -261,7 +261,7 @@ export class DogeRestApiClient {
         };
       };
     }
-    const response = await this.request.get<TxHexResponse>(`/transactions/${txId}/raw-data`);
+    const response = await this.request.get<TxHexResponse>(`/transactions/${txid}/raw-data`);
     return response.data.data.item.transactionHex;
   }
 
