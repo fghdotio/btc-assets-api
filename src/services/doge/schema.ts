@@ -46,10 +46,25 @@ export const Output = z.object({
   value: z.number(),
 });
 
+export const Input = z.object({
+  txid: z.string(),
+  vout: z.number(),
+  prevout: Output.or(z.null()),
+  scriptsig: z.string(),
+  scriptsig_asm: z.string(),
+  witness: z.array(z.string()).optional(),
+  is_coinbase: z.boolean(),
+  sequence: z.coerce.number(),
+});
+
 export const Transaction = z.object({
   txid: z.string(),
-  status: Status,
+  version: z.number(),
+  locktime: z.number(),
+  vin: z.array(Input),
   vout: z.array(Output),
-
-  // TODO: add more fields
+  size: z.number(),
+  weight: z.number(),
+  fee: z.number(),
+  status: Status,
 });

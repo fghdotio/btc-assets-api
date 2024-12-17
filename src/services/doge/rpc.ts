@@ -1,6 +1,9 @@
 import axios, { AxiosInstance } from 'axios';
 
 // https://github.com/dogecoin/dogecoin/blob/master/doc/rpc-maturity.md
+// https://developer.bitcoin.org/reference/rpc/index.html
+// https://mempool.space/docs/api/rest
+// https://github.com/blockstream/esplora/blob/master/API.md
 export class DogeRpcClient {
   private request: AxiosInstance;
 

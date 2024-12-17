@@ -42,6 +42,7 @@ import { CoinType } from '../constants';
 
 export interface ITransactionRequest {
   txid: string;
+  coinType: CoinType;
   ckbVirtualResult: CKBVirtualResult;
   context?: {
     jwt: JwtPayload;
@@ -123,6 +124,10 @@ export default class TransactionProcessor
     };
   }
 
+  public static cacheKey(txid: string, coinType: CoinType) {
+    return `${coinType}_${txid}`;
+  }
+
   /**
    * Clear the btcTxId in the RGBPP_LOCK/BTC_TIME_LOCK script to avoid the mismatch between the CKB and BTC transactions
    * @param ckbRawTx - CKB Raw Transaction
@@ -179,6 +184,7 @@ export default class TransactionProcessor
    * @param request - transaction request, including txid and ckbVirtualResult
    * @param btcTx - Bitcoin transaction
    */
+  // TODO: getCommitment
   public async verifyTransaction(request: ITransactionRequest, btcTx: Transaction): Promise<boolean> {
     const { txid, ckbVirtualResult } = request;
     const { commitment, ckbRawTx } = ckbVirtualResult;
@@ -226,6 +232,7 @@ export default class TransactionProcessor
    * @param ckbVirtualResult - the CKB Virtual Transaction
    * @param txid - the real BTC transaction id
    */
+  // TODO:
   private getCkbRawTxWithRealBtcTxid(ckbVirtualResult: CKBVirtualResult, txid: string) {
     let ckbRawTx = ckbVirtualResult.ckbRawTx;
     const needUpdateCkbTx = ckbRawTx.outputs.some((output) => {
@@ -278,6 +285,7 @@ export default class TransactionProcessor
    * @param txid - the transaction id
    * @param ckbRawTx - the CKB Raw Transaction
    */
+  // TODO:
   private async appendTxWitnesses(txid: string, ckbRawTx: CKBRawTransaction) {
     const [hex, rgbppApiSpvProof] = await Promise.all([
       this.cradle.bitcoin.getTxHex({ txid }),
@@ -339,6 +347,7 @@ export default class TransactionProcessor
    */
   private async appendPaymasterCellAndSignTx(
     btcTx: Transaction,
+    coinType: CoinType,
     ckbVirtualResult: CKBVirtualResult,
     signedTx: CKBRawTransaction,
   ) {
@@ -349,6 +358,7 @@ export default class TransactionProcessor
         this.cradle.logger.info(`[TransactionProcessor] Paymaster receives UTXO not found: ${btcTx.txid}`);
         throw new InvalidTransactionError('Paymaster receives UTXO not found', {
           txid: btcTx.txid,
+          coinType,
           ckbVirtualResult,
         });
       }
@@ -378,13 +388,14 @@ export default class TransactionProcessor
     this.cradle.logger.debug(
       `[TransactionProcessor] Fix pool rejected transaction by increasing the fee rate: ${job.data.txid}`,
     );
-    const { txid, ckbVirtualResult } = job.data;
+    const { txid, ckbVirtualResult, coinType } = job.data;
     const { ckbRawTx } = ckbVirtualResult;
     // append the secp256k1 cell dep to the transaction
     ckbRawTx.cellDeps.push(getSecp256k1CellDep(IS_MAINNET));
     // update the job data to append the paymaster cell next time
     job.updateData({
       txid,
+      coinType,
       ckbVirtualResult: {
         ...ckbVirtualResult,
         ckbRawTx,
@@ -407,9 +418,9 @@ export default class TransactionProcessor
    */
   public async process(job: Job<ITransactionRequest>, token?: string) {
     try {
-      const { ckbVirtualResult, txid } = cloneDeep(job.data);
+      const { ckbVirtualResult, txid, coinType } = cloneDeep(job.data);
       const btcTx = await this.cradle.bitcoin.getTx({ txid });
-      const isVerified = await this.verifyTransaction({ ckbVirtualResult, txid }, btcTx);
+      const isVerified = await this.verifyTransaction({ ckbVirtualResult, txid, coinType }, btcTx);
       if (!isVerified) {
         throw new InvalidTransactionError('Invalid transaction', job.data);
       }
@@ -420,7 +431,7 @@ export default class TransactionProcessor
       try {
         // append paymaster cell and sign the transaction if needed
         if (ckbVirtualResult.needPaymasterCell) {
-          signedTx = await this.appendPaymasterCellAndSignTx(btcTx, ckbVirtualResult, signedTx);
+          signedTx = await this.appendPaymasterCellAndSignTx(btcTx, coinType, ckbVirtualResult, signedTx);
         }
         this.cradle.logger.debug(`[TransactionProcessor] Transaction signed: ${JSON.stringify(signedTx)}`);
 
@@ -447,10 +458,7 @@ export default class TransactionProcessor
         if (this.cradle.env.UTXO_SYNC_DATA_CACHE_ENABLE) {
           try {
             const addresses = btcTx.vout.map((vout) => vout.scriptpubkey_address).filter((address) => address);
-            await Promise.all(
-              // !!! FIXME: hard code the coin type for now
-              addresses.map((address) => this.cradle.utxoSyncer.enqueueSyncJob(address!, CoinType.BTC)),
-            );
+            await Promise.all(addresses.map((address) => this.cradle.utxoSyncer.enqueueSyncJob(address!, coinType)));
           } catch (err) {
             // ignore the error if enqueue sync job failed, to avoid the transaction failed
             // already catch the error inside the utxo syncer
@@ -544,8 +552,10 @@ export default class TransactionProcessor
    * @param request - the transaction request
    */
   public async enqueueTransaction(request: ITransactionRequest): Promise<Job<ITransactionRequest>> {
-    const job = await this.queue.add(request.txid, request, {
-      jobId: request.txid,
+    const { txid, coinType } = request;
+    const jobId = TransactionProcessor.cacheKey(txid, coinType);
+    const job = await this.queue.add(jobId, request, {
+      jobId,
       delay: this.cradle.env.TRANSACTION_QUEUE_JOB_DELAY,
     });
     return job;

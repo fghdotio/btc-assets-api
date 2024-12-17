@@ -6,6 +6,7 @@ import { CKBVirtualResult } from './types';
 import { Job } from 'bullmq';
 import { CUSTOM_HEADERS } from '../../constants';
 import { JwtPayload } from '../../plugins/jwt';
+import { CoinType } from '../../constants';
 
 const transactionRoute: FastifyPluginCallback<Record<never, never>, Server, ZodTypeProvider> = (fastify, _, done) => {
   fastify.post(
@@ -15,7 +16,8 @@ const transactionRoute: FastifyPluginCallback<Record<never, never>, Server, ZodT
         description: 'Submit a RGB++ CKB transaction',
         tags: ['RGB++'],
         body: z.object({
-          btc_txid: z.string(),
+          txid: z.string(),
+          coin_type: z.nativeEnum(CoinType).default(CoinType.BTC),
           ckb_virtual_result: CKBVirtualResult.or(z.string()).transform((value) => {
             if (typeof value === 'string') {
               value = JSON.parse(value);
@@ -37,10 +39,11 @@ const transactionRoute: FastifyPluginCallback<Record<never, never>, Server, ZodT
       },
     },
     async (request, reply) => {
-      const { btc_txid, ckb_virtual_result } = request.body;
+      const { txid, coin_type, ckb_virtual_result } = request.body;
       const jwt = (await request.jwtDecode()) as JwtPayload;
       const job: Job = await fastify.transactionProcessor.enqueueTransaction({
-        txid: btc_txid,
+        txid,
+        coinType: coin_type,
         ckbVirtualResult: ckb_virtual_result,
         context: { jwt },
       });

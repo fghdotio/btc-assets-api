@@ -12,8 +12,10 @@ describe('DogeRestApiClient', () => {
   });
 
   const testnetBlockHash: string = '577f016bbf165a905fc7778f89d3ccc5be04b5cfd1490004fa21746cf9decf4c';
-  const testnetTxId: string = 'de5df2efbf03237f71aa420cbd189d16fc1beb8b902fa8643d5930479e9ca0c3';
+  const testnetCoinbaseTxId: string = 'de5df2efbf03237f71aa420cbd189d16fc1beb8b902fa8643d5930479e9ca0c3';
+  const testnetTxId: string = '02605b84a2a829dc08aa032b3b3bb100ae36f6ad813a9a6906d6bdf283a2257c';
   const testnetAddress: string = 'nsSfZttkEy2ZkujJUmQvKdjsTVRXSAwSvm';
+  const testnetMinerAddress: string = 'nmZ36RoFkyd9tKqfTk2iBt5UfgLfbcxC98';
   // nWujuS2wgYTbyL7B3dk7RoLb7KqfEY7tVS
   const testnetWif: string = 'QWzHvo6EBqEpYADitbmV7Ybq9ufGN3q16fvVc2dXH9egQSpCr64A';
 
@@ -87,6 +89,7 @@ describe('DogeRestApiClient', () => {
   describe('getTx', () => {
     it('should return the transaction', async () => {
       console.log(await testnetClient.getTx({ txId: testnetTxId }));
+      console.log(await testnetClient.getTx({ txId: testnetCoinbaseTxId }));
     });
   });
 
@@ -94,9 +97,9 @@ describe('DogeRestApiClient', () => {
     it('should return the transactions', async () => {
       const txs = await testnetClient.getAddressTxs({ address: testnetAddress });
       console.log(txs);
-      txs.forEach((tx) => {
-        console.log(tx.vout);
-      });
+
+      const txsMiner = await testnetClient.getAddressTxs({ address: testnetMinerAddress });
+      console.log(txsMiner);
     });
   });
 
@@ -108,6 +111,6 @@ describe('DogeRestApiClient', () => {
 });
 
 /* 
-pnpm vitest run src/services/doge/restapi.test.ts -t "getAddressTxsUtxo"
+pnpm vitest run src/services/doge/restapi.test.ts -t "getTx should return the transaction"
 pnpm vitest run src/services/doge/restapi.test.ts -t "getAddressTxs should return the transactions"
 */

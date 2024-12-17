@@ -1,9 +1,48 @@
 import axios, { AxiosInstance } from 'axios';
 import { z } from 'zod';
 
-import { Block, Status, UTXO, Transaction, Output } from './schema';
+import { Block, Status, UTXO, Transaction, Output, Input } from './schema';
 
 export const baseUrl = 'https://rest.cryptoapis.io/blockchain-data/dogecoin';
+
+interface TxInResponse {
+  isConfirmed: boolean;
+  transactionHash: string;
+  transactionId: string;
+  timestamp: number;
+  minedInBlockHash: string;
+  minedInBlockHeight: string;
+  fee: {
+    amount: string;
+    unit: string;
+  };
+  blockchainSpecific: {
+    version: number;
+    locktime: number;
+    size: number;
+    vout: {
+      scriptPubKey: {
+        addresses: string[];
+        asm: string;
+        hex: string;
+        type: string;
+      };
+      value: string;
+    }[];
+    vin: {
+      txid: string;
+      vout: number;
+      coinbase: string;
+      scriptSig: {
+        asm: string;
+        hex: string;
+        type: string;
+      };
+      sequence: number;
+      txinwitness: string[];
+    }[];
+  };
+}
 
 // using cryptoapis.io endpoint
 export class DogeRestApiClient {
@@ -105,26 +144,7 @@ export class DogeRestApiClient {
         limit: number;
         offset: number;
         total: number;
-        items: [
-          {
-            timestamp: number;
-            transactionId: string;
-            transactionHash: string;
-            minedInBlockHash: string;
-            minedInBlockHeight: string;
-            blockchainSpecific: {
-              vout: {
-                scriptPubKey: {
-                  addresses: string[];
-                  asm: string;
-                  hex: string;
-                  type: string;
-                };
-                value: string;
-              }[];
-            };
-          },
-        ];
+        items: TxInResponse[];
       };
     };
     const unconfirmedRes = await this.request.get<AddressTxsResponse>(
@@ -139,15 +159,37 @@ export class DogeRestApiClient {
     merged.sort((a, b) => b.timestamp - a.timestamp);
 
     const transactions = merged.map((item) => {
+      const {
+        fee,
+        blockchainSpecific: { vout, vin, version, locktime, size },
+      } = item;
       return Transaction.parse({
         txid: item.transactionId || item.transactionHash,
-        vout: item.blockchainSpecific.vout.map((vout) => {
+        version,
+        locktime,
+        size,
+        weight: 0,
+        fee: parseFloat(fee.amount),
+        vout: vout.map((vout) => {
           return Output.parse({
             scriptpubkey: vout.scriptPubKey.hex,
             scriptpubkey_asm: vout.scriptPubKey.asm,
             scriptpubkey_type: vout.scriptPubKey.type,
             scriptpubkey_address: vout.scriptPubKey.addresses.length > 0 ? vout.scriptPubKey.addresses[0] : undefined,
             value: parseFloat(vout.value),
+          });
+        }),
+        vin: vin.map((vin) => {
+          const isCoinbase = !!vin.coinbase;
+          return Input.parse({
+            txid: isCoinbase ? '' : vin.txid,
+            vout: isCoinbase ? -1 : vin.vout,
+            prevout: null,
+            scriptsig: isCoinbase ? '' : vin.scriptSig.hex,
+            scriptsig_asm: isCoinbase ? '' : vin.scriptSig.asm,
+            witness: vin.txinwitness,
+            is_coinbase: isCoinbase,
+            sequence: vin.sequence,
           });
         }),
         status: Status.parse({
@@ -163,13 +205,51 @@ export class DogeRestApiClient {
   public async getTx({ txId }: { txId: string }) {
     interface TxResponse {
       data: {
-        // TODO
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        item: any;
+        item: TxInResponse;
       };
     }
     const response = await this.request.get<TxResponse>(`/transactions/${txId}`);
-    return response.data.data.item;
+    // console.log(response.data.data.item);
+    const {
+      isConfirmed,
+      blockchainSpecific: { vout, vin, version, locktime, size },
+      transactionId,
+      fee,
+    } = response.data.data.item;
+    const tx = Transaction.parse({
+      txid: transactionId,
+      version,
+      locktime,
+      size,
+      weight: 0,
+      fee: parseFloat(fee.amount),
+      vout: vout.map((vout) => {
+        return Output.parse({
+          scriptpubkey: vout.scriptPubKey.hex,
+          scriptpubkey_asm: vout.scriptPubKey.asm,
+          scriptpubkey_type: vout.scriptPubKey.type,
+          scriptpubkey_address: vout.scriptPubKey.addresses[0],
+          value: parseFloat(vout.value),
+        });
+      }),
+      vin: vin.map((vin) => {
+        const isCoinbase = !!vin.coinbase;
+        return Input.parse({
+          txid: isCoinbase ? '' : vin.txid,
+          vout: isCoinbase ? -1 : vin.vout,
+          prevout: null,
+          scriptsig: isCoinbase ? '' : vin.scriptSig.hex,
+          scriptsig_asm: isCoinbase ? '' : vin.scriptSig.asm,
+          witness: vin.txinwitness,
+          is_coinbase: isCoinbase,
+          sequence: vin.sequence,
+        });
+      }),
+      status: Status.parse({
+        confirmed: isConfirmed,
+      }),
+    });
+    return tx;
   }
 
   // https://developers.cryptoapis.io/v-1.2023-04-25-105/RESTapis/unified-endpoints/get-raw-transaction-data/get
