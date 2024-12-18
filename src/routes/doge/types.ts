@@ -37,3 +37,19 @@ export const Transaction = z.object({
   fee: z.number(),
   status: Status,
 });
+
+export const Block = z.object({
+  id: z.string(),
+  height: z.number(),
+  version: z.number(),
+  timestamp: z.number(),
+  tx_count: z.number(),
+  size: z.number(),
+  weight: z.number(),
+  merkle_root: z.string(),
+  previousblockhash: z.string(),
+  mediantime: z.number(),
+  nonce: z.number(),
+  bits: z.number(),
+  difficulty: z.number(),
+});

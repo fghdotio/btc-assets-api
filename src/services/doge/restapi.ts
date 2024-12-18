@@ -342,7 +342,7 @@ export class DogeRestApiClient {
   }
 
   // https://developers.cryptoapis.io/v-1.2023-04-25-105/RESTapis/unified-endpoints/list-transactions-by-block-hash/get
-  public async getBlockTxids({ hash }: { hash: string }) {
+  public async getBlockTxids({ hash }: { hash: string }): Promise<string[]> {
     interface BlockTxResponse {
       data: {
         items: {

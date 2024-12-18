@@ -106,7 +106,7 @@ export default class DogeClient {
     return this.call('getTxHex', { txid });
   }
 
-  public async getBlock({ hash }: { hash: string }) {
+  public async getBlock({ hash }: { hash: string }): Promise<z.infer<typeof Block>> {
     return this.call('getBlock', { hash });
   }
 
@@ -118,7 +118,7 @@ export default class DogeClient {
     return this.call('getBlockHeader', { hash });
   }
 
-  public async getBlockTxids({ hash }: { hash: string }) {
+  public async getBlockTxids({ hash }: { hash: string }): Promise<string[]> {
     return this.call('getBlockTxids', { hash });
   }
 

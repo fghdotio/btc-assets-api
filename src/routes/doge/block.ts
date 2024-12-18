@@ -3,8 +3,54 @@ import { Server } from 'http';
 import { CUSTOM_HEADERS } from '../../constants';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import z from 'zod';
-
+import { Block } from './types';
 const blockRoutes: FastifyPluginCallback<Record<never, never>, Server, ZodTypeProvider> = (fastify, _, done) => {
+  fastify.get(
+    '/:hash',
+    {
+      schema: {
+        description: 'Get a block by its hash',
+        tags: ['Dogecoin'],
+        params: z.object({
+          hash: z.string().length(64, 'should be a 64-character hex string').describe('The Dogecoin block hash'),
+        }),
+        response: {
+          200: Block,
+        },
+      },
+    },
+    async (request, reply) => {
+      const { hash } = request.params;
+      const block = await fastify.doge.getBlock({ hash });
+      reply.header(CUSTOM_HEADERS.ResponseCacheable, 'true');
+      return block;
+    },
+  );
+
+  fastify.get(
+    '/:hash/txids',
+    {
+      schema: {
+        description: 'Get block transaction ids by its hash',
+        tags: ['Dogecoin'],
+        params: z.object({
+          hash: z.string().length(64, 'should be a 64-character hex string').describe('The Dogecoin block hash'),
+        }),
+        response: {
+          200: z.object({
+            txids: z.array(z.string()),
+          }),
+        },
+      },
+    },
+    async (request, reply) => {
+      const { hash } = request.params;
+      const txids = await fastify.doge.getBlockTxids({ hash });
+      reply.header(CUSTOM_HEADERS.ResponseCacheable, 'true');
+      return { txids };
+    },
+  );
+
   fastify.get(
     '/height/:height',
     {
