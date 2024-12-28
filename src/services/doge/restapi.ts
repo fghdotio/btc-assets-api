@@ -194,6 +194,9 @@ export class DogeRestApiClient {
         }),
         status: Status.parse({
           confirmed: item.minedInBlockHash !== null && item.minedInBlockHeight !== null,
+          block_hash: item.minedInBlockHash,
+          block_height: parseInt(item.minedInBlockHeight, 10),
+          block_time: item.timestamp,
         }),
       });
     });
@@ -212,6 +215,9 @@ export class DogeRestApiClient {
     // console.log(response.data.data.item);
     const {
       isConfirmed,
+      minedInBlockHash,
+      minedInBlockHeight,
+      timestamp,
       blockchainSpecific: { vout, vin, version, locktime, size },
       transactionId,
       fee,
@@ -247,6 +253,9 @@ export class DogeRestApiClient {
       }),
       status: Status.parse({
         confirmed: isConfirmed,
+        block_hash: isConfirmed ? minedInBlockHash : '',
+        block_height: isConfirmed ? parseInt(minedInBlockHeight, 10) : 0,
+        block_time: isConfirmed ? timestamp : 0,
       }),
     });
     return tx;

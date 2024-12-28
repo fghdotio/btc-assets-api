@@ -14,7 +14,8 @@ describe('DogeRpcClient', () => {
   let testnetRpcClient: DogeRpcClient;
   const testnetBlockHash = '2cf27df561ea1d78eae6945b544378aad78cde2302dc9e65b82892545b4d92d3';
   const testnetGenesisBlockHash = 'bb0a78264637406b6360aad926284d544d7049f45189db5664f3c4d07350559e';
-  const testnetTxId = 'de5df2efbf03237f71aa420cbd189d16fc1beb8b902fa8643d5930479e9ca0c3';
+  const testnetCoinbaseTxId: string = 'de5df2efbf03237f71aa420cbd189d16fc1beb8b902fa8643d5930479e9ca0c3';
+  const testnetTxId: string = '02605b84a2a829dc08aa032b3b3bb100ae36f6ad813a9a6906d6bdf283a2257c';
 
   // let mainnetRpcClient: DogeRpcClient;
 
@@ -101,9 +102,18 @@ describe('DogeRpcClient', () => {
       console.log(await testnetRpcClient.getFeesRecommended());
     });
   });
+
+  describe('getTx', () => {
+    it('should return the tx', async () => {
+      const tx = await testnetRpcClient.getTx({ txId: testnetTxId });
+      console.log(tx);
+      const txCoinbase = await testnetRpcClient.getTx({ txId: testnetCoinbaseTxId });
+      console.log(txCoinbase);
+    });
+  });
 });
 
 /* 
 pnpm vitest run src/services/doge/rpc.test.ts
-pnpm vitest run src/services/doge/rpc.test.ts -t "getFeesRecommended"
+pnpm vitest run src/services/doge/rpc.test.ts -t "getTx should return the tx"
 */

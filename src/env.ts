@@ -216,6 +216,9 @@ const envSchema = z
     */
     DOGE_CRYPTO_APIS_API_KEY: z.string(),
     DOGE_NETWORK: z.enum(['mainnet', 'testnet']).default('testnet'),
+    DOGE_RPC_URL: z.string(),
+    DOGE_RPC_USERNAME: z.string(),
+    DOGE_RPC_PASSWORD: z.string(),
   })
   .and(
     z.union([

@@ -1,5 +1,35 @@
 import axios, { AxiosInstance } from 'axios';
 
+// import { Transaction, Status, Input, Output } from './schema';
+
+interface TxInResponse {
+  txid: string;
+  version: number;
+  locktime: number;
+  confirmations: number; // TODO: for unconfirmed tx
+  vin: Array<
+    | {
+        txid: string;
+        vout: number;
+        sequence: number;
+      }
+    | {
+        coinbase: string;
+        sequence: number;
+      }
+  >; // TODO
+  vout: {
+    value: number;
+    scriptPubKey: {
+      asm: string;
+      hex: string;
+      type: string;
+      address: string[];
+    };
+  }[];
+  size: number;
+}
+
 // https://github.com/dogecoin/dogecoin/blob/master/doc/rpc-maturity.md
 // https://developer.bitcoin.org/reference/rpc/index.html
 // https://mempool.space/docs/api/rest
@@ -88,9 +118,31 @@ export class DogeRpcClient {
   // Returns details about a transaction.
   public async getTx({ txId }: { txId: string }) {
     interface GetTxResponse {
-      result: Record<string, unknown>;
+      result: TxInResponse;
     }
     const response = await this.request.post<GetTxResponse>('/', this.rpcReq('getrawtransaction', [txId, true]));
+    // const { txid, version, locktime, vin, vout, size, confirmations } = response.data.result;
+    // const tx = Transaction.parse({
+    //   txid,
+    //   version,
+    //   locktime,
+    //   size,
+    //   weight: 0,
+    //   fee: 0,
+    //   status: Status.parse({
+    //     confirmed: confirmations > 0,
+    //   }),
+    //   vout: vout.map((vout) =>
+    //     Output.parse({
+    //       scriptpubkey: vout.scriptPubKey.hex,
+    //       scriptpubkey_asm: vout.scriptPubKey.asm,
+    //       scriptpubkey_type: vout.scriptPubKey.type,
+    //       scriptpubkey_address: vout.scriptPubKey.address[0],
+    //       value: vout.value,
+    //     }),
+    //   ),
+    // });
+
     return response.data.result;
   }
 

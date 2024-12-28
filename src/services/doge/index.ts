@@ -2,18 +2,21 @@ import { z } from 'zod';
 
 import { Cradle } from '../../container';
 import { DogeRestApiClient } from './restapi';
+import { DogeRpcClient } from './rpc';
 import { IS_MAINNET, NetworkType } from '../../constants';
 import { Block, UTXO, Transaction } from './schema';
 
 export default class DogeClient {
   private cradle: Cradle;
   private source;
+  private rpc;
   private fallback?;
 
   constructor(cradle: Cradle) {
     this.cradle = cradle;
     const { env } = cradle;
     this.source = new DogeRestApiClient(env.DOGE_NETWORK, env.DOGE_CRYPTO_APIS_API_KEY);
+    this.rpc = new DogeRpcClient(env.DOGE_RPC_URL, env.DOGE_RPC_USERNAME, env.DOGE_RPC_PASSWORD);
 
     // TODO: add a fallback data source
     this.fallback = new DogeRestApiClient(env.DOGE_NETWORK, env.DOGE_CRYPTO_APIS_API_KEY);
@@ -119,7 +122,8 @@ export default class DogeClient {
   }
 
   public async getBlockTxids({ hash }: { hash: string }): Promise<string[]> {
-    return this.call('getBlockTxids', { hash });
+    // return this.call('getBlockTxids', { hash });
+    return this.rpc.getBlockTxids({ hash });
   }
 
   public async getBlocksTipHash(): Promise<string> {
