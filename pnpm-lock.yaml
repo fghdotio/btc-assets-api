@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@cell-studio/mempool.js':
-        specifier: ^2.4.0
-        version: 2.4.0
       '@ckb-lumos/base':
         specifier: '^0.22.2 '
         version: 0.22.2
@@ -48,7 +45,7 @@ importers:
         specifier: ^5.5.0
         version: 5.5.0
       '@fastify/swagger':
-        specifier: ^8.14.0
+        specifier: 8.14.0
         version: 8.14.0
       '@fastify/swagger-ui':
         specifier: ^3.0.0
@@ -56,18 +53,21 @@ importers:
       '@immobiliarelabs/fastify-sentry':
         specifier: ^8.0.1
         version: 8.0.1
+      '@mempool/mempool.js':
+        specifier: ^3.0.0
+        version: 3.0.0
       '@nervosnetwork/ckb-sdk-utils':
-        specifier: ^0.109.1
-        version: 0.109.1
+        specifier: ^0.109.5
+        version: 0.109.5
       '@rgbpp-sdk/btc':
-        specifier: ^0.4.0
-        version: 0.4.0(@ckb-lumos/lumos@0.22.2)
+        specifier: 0.7.0
+        version: 0.7.0(@ckb-lumos/lumos@0.22.2)
       '@rgbpp-sdk/ckb':
-        specifier: ^0.4.0
-        version: 0.4.0(@ckb-lumos/lumos@0.22.2)(lodash@4.17.21)
+        specifier: 0.7.0
+        version: 0.7.0(@ckb-lumos/lumos@0.22.2)(lodash@4.17.21)
       '@rgbpp-sdk/service':
-        specifier: ^0.4.0
-        version: 0.4.0
+        specifier: 0.7.0
+        version: 0.7.0
       '@sentry/node':
         specifier: ^7.102.1
         version: 7.102.1
@@ -77,6 +77,9 @@ importers:
       '@spore-sdk/core':
         specifier: ^0.2.0-beta.9
         version: 0.2.0-beta.9(@ckb-lumos/lumos@0.22.2)(lodash@4.17.21)
+      '@utxostack/metadata':
+        specifier: ^0.0.6
+        version: 0.0.6
       async-retry:
         specifier: ^1.3.3
         version: 1.3.3
@@ -90,7 +93,7 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1
       bullmq:
-        specifier: ^5.4.2
+        specifier: 5.4.2
         version: 5.4.2
       dotenv:
         specifier: ^16.4.2
@@ -178,8 +181,8 @@ importers:
         specifier: ^15.2.2
         version: 15.2.2
       nodemon:
-        specifier: ^3.1.7
-        version: 3.1.7
+        specifier: ^3.1.9
+        version: 3.1.9
       pino-pretty:
         specifier: ^10.3.1
         version: 10.3.1
@@ -307,9 +310,6 @@ packages:
 
   '@bitcoinerlab/secp256k1@1.1.1':
     resolution: {integrity: sha512-uhjW51WfVLpnHN7+G0saDcM/k9IqcyTbZ+bDgLF3AX8V/a3KXSE9vn7UPBrcdU72tp0J4YPR7BHp2m7MLAZ/1Q==}
-
-  '@cell-studio/mempool.js@2.4.0':
-    resolution: {integrity: sha512-g9cvOGrBILES4nfryfFDfNZvIq2WxlYk3IcBrH4otAv/j8DGCQ3IyxjZq81qv6bz7TeFxVp1YUEr2T7FluJZNQ==}
 
   '@ckb-lumos/base@0.22.2':
     resolution: {integrity: sha512-nosUCSa5rTV2IzxbEpqzrvUeQNXB66mgA0h40+QEdnE/gV/s4ke83AScrTAxWkErJy1G/sToIHCc2kWwO95DfQ==}
@@ -546,6 +546,7 @@ packages:
   '@exact-realty/multipart-parser@1.0.13':
     resolution: {integrity: sha512-BGnB0VVn18dkz85rvBmp/CyxAMvUcVrsNf3qw8Fdx80V6+MsQUTxRdQnC0PzLIxbN8PKGFs8afd+ur8V1JLv8g==}
     engines: {node: '>=16.0.0', npm: '>=8.0.0'}
+    deprecated: Package has moved to @apeleghq/multipart-parser
 
   '@fastify/accept-negotiator@1.1.0':
     resolution: {integrity: sha512-OIHZrb2ImZ7XG85HXOONLcJWGosv7sIvM2ifAPQVhg9Lv7qdmMBNVaai4QTdyuaqbKM5eO6sLSQOYI7wEQeCJQ==}
@@ -662,6 +663,9 @@ packages:
     resolution: {integrity: sha512-Yhlar6v9WQgUp/He7BdgzOz8lqMQ8sU+jkCq7Wx8Myc5YFJLbEe7lgui/V7G1qB1DJykHSGwreceSaD60Y0PUQ==}
     hasBin: true
 
+  '@mempool/mempool.js@3.0.0':
+    resolution: {integrity: sha512-ZfNDcPA0HLpE8u+6/Tl/53F0WTL1CebwIrOIUeajvlXiXlDkhj/pTxnXQhMoxKOJK3qQnUjt6CQuX/TGBaFw7A==}
+
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.2':
     resolution: {integrity: sha512-9bfjwDxIDWmmOKusUcqdS4Rw+SETlp9Dy39Xui9BEGEk19dDwH0jhipwFzEff/pFg95NKymc6TOTbRKcWeRqyQ==}
     cpu: [arm64]
@@ -692,17 +696,17 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@nervosnetwork/ckb-sdk-core@0.109.1':
-    resolution: {integrity: sha512-YU3yJZvz69WU6Bw//vRxzxLGcIj74CwGffdp6GYZbQpZwFaACT6FCojvOMjHIyJ8Rw32r114LhMKHvyBwagWjw==}
+  '@nervosnetwork/ckb-sdk-core@0.109.5':
+    resolution: {integrity: sha512-eh3RjJlf8LqIAf03m81YLnuDaTOzs8C2cqXGJT9pdJIwEAaRcmgG6xZr5m9fdOMaeFMvaF4BQyjCeGjTQCFRGA==}
 
-  '@nervosnetwork/ckb-sdk-rpc@0.109.1':
-    resolution: {integrity: sha512-RoUhXmaOm1g7ga1G3guNTzSDit79k7nqj3rYbk2jSlULRo34g9L06juU24hmwwuFZfiCaARI9mgACu0ScW9itw==}
+  '@nervosnetwork/ckb-sdk-rpc@0.109.5':
+    resolution: {integrity: sha512-rT7iVRtagP3TxWel4zwXo6BAKfne4TBrGTnjmVTfqa/mrMNonVwOyJcFhWNSvq/r8HufL3QlYhngLHVDNomURQ==}
 
-  '@nervosnetwork/ckb-sdk-utils@0.109.1':
-    resolution: {integrity: sha512-KK8w+JZGPt/Gq/Y0b87AuQp8mGR46fBSkqnjwASdBAi2rts9tJ6srEaZ3FVVa9LtjTlThQ120hex+mcyastrkQ==}
+  '@nervosnetwork/ckb-sdk-utils@0.109.5':
+    resolution: {integrity: sha512-Tx642hcJWbN8W3KzCIhIo49yzJ8LMqWopQCSBDKuRmwHesO/bvJqYojCVwfrOyROtFOPhgjyiGm5RXBuxm0KpQ==}
 
-  '@nervosnetwork/ckb-types@0.109.1':
-    resolution: {integrity: sha512-mD5mOCGa1JertKZekHSUVYwFPW27VJ0/MdwblWvEEK7pNIU6az+dLiIxgvl4TxR+j+7/GqmXNH1U59CM92y/wg==}
+  '@nervosnetwork/ckb-types@0.109.5':
+    resolution: {integrity: sha512-5jQNjFw76YCd+Ppl+0RvBWzxwvWaKfWC5wjVFFdNAieX7xksCHfZFIeow8je7AF8uVypwe56WlLBlblxw9NBBQ==}
 
   '@noble/hashes@1.4.0':
     resolution: {integrity: sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==}
@@ -730,14 +734,14 @@ packages:
   '@polka/url@1.0.0-next.24':
     resolution: {integrity: sha512-2LuNTFBIO0m7kKIQvvPHN6UE63VjpmL9rnEEaOOaiSPbZK+zUOYIzBAWcED+3XYzhYsd/0mD57VdxAEqqV52CQ==}
 
-  '@rgbpp-sdk/btc@0.4.0':
-    resolution: {integrity: sha512-4Fx/UsN2T1CyhyasK565ChofxRFA1JyCSnUuAPh0fpQ2AAcPzrbKGZS65hpOPa/2qClkzzszdXz1sgkbXUCaPg==}
+  '@rgbpp-sdk/btc@0.7.0':
+    resolution: {integrity: sha512-QYtl8Ez3z4FwhGzaBngVqG5WaIdmesD5J+m3RFoBUHvx5MfOgHD+ofgkZreEyRIkp7fwwsicCZ57GCiB/Yq2Dg==}
 
-  '@rgbpp-sdk/ckb@0.4.0':
-    resolution: {integrity: sha512-mqwWL+mnuyzLoGBR58eeNPRITp0fVqf0smU8BiR0Ey4cVpF206mBMscgex8EHwgAMU6cUjBLBDej0HYugpshZw==}
+  '@rgbpp-sdk/ckb@0.7.0':
+    resolution: {integrity: sha512-OBUuapLVtKR+72XwY40+UlBhalWZx99Oo1fWM3KihGwObruvvrA092daaaEi9oSbfVvzzl4B9XhSnLM6W5GPHA==}
 
-  '@rgbpp-sdk/service@0.4.0':
-    resolution: {integrity: sha512-OvSNcSAmI7RDbf2bzySmHL0UO/S4dn5LAWrfJ41B2WXZiKAAtZ5IG4ajW6RKz6bxf0t7EcjRtXimdGieoubzyw==}
+  '@rgbpp-sdk/service@0.7.0':
+    resolution: {integrity: sha512-iz21HjUhA0jbfIefFa1Jfoigrofuu/ulVbfpBw63TJT7pQUVxtw9HgnW9mGb4nIQHgx+1wJeqnjFYojFuJ17fw==}
 
   '@rollup/pluginutils@4.2.1':
     resolution: {integrity: sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==}
@@ -998,6 +1002,9 @@ packages:
   '@ungap/structured-clone@1.2.0':
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
 
+  '@utxostack/metadata@0.0.6':
+    resolution: {integrity: sha512-oech0S5HUFMhbrVNk9jEIXi3L8It23bTGcRiC3m30eyn0AtwWlMJyj49mC//4hgLKUFEmVhVSjTKsrYY2wSmhg==}
+
   '@vercel/build-utils@7.7.0':
     resolution: {integrity: sha512-dYE0QKnRj9tN1F2AAKHagh3QkgQhz7AWcrRqnp5gjEp74EnxBKJIcZe5qqyKANMCLQ1e96RYy1pQB3zPMGeEzg==}
 
@@ -1222,8 +1229,8 @@ packages:
     resolution: {integrity: sha512-+ylXK26rx4BVfzAB9AXQE+k/nomshpW8ISR+vZN2QecMiCoaT8km4DaIO0nazYSCX6nZCHYOFnoeCa5cE13NEA==}
     engines: {node: '>=14.0.0'}
 
-  axios@1.6.7:
-    resolution: {integrity: sha512-/hDJGff6/c7u0hDkvkGxR/oy6CbCs8ziCsC7SqmhjfozqiJGc8Z11wrv9z9lYfY4K8l+H9TpjcMDX0xOZmx+RA==}
+  axios@1.7.4:
+    resolution: {integrity: sha512-DukmaFRnY6AzAALSH4J2M3k6PkaC+MfaAGdEERRWcC9q3/TWQwLpHR8ZRLKTdQ3aBDL64EdluRDjJqKw+BPZEw==}
 
   axios@1.7.7:
     resolution: {integrity: sha512-S4kL7XrjgBmvdGut0sN3yJxqYzrDOnivkBiN0OFs6hLiUam3UPvswUo0kqGyhqUZGEOytHyumEdXsAkgCOUf3Q==}
@@ -1612,11 +1619,11 @@ packages:
   electron-to-chromium@1.4.689:
     resolution: {integrity: sha512-GatzRKnGPS1go29ep25reM94xxd1Wj8ritU0yRhCJ/tr1Bg8gKnm6R9O/yPOhGQBoLMZ9ezfrpghNaTw97C/PQ==}
 
-  elliptic@6.5.4:
-    resolution: {integrity: sha512-iLhC6ULemrljPZb+QutR5TQGB+pdW6KGD5RSegS+8sorOZT+rdQFbsQFJgvN3eRqNALqJer4oQ16YvJHlU8hzQ==}
-
   elliptic@6.5.5:
     resolution: {integrity: sha512-7EjbcmUm17NQFu4Pmgmq2olYMj8nwMnpcddByChSUjArp8F5DQWcIcpriwO4ZToLNAJig0yiyjswfyGNje/ixw==}
+
+  elliptic@6.6.1:
+    resolution: {integrity: sha512-RaddvvMatK2LJHqFJ+YA4WysVN5Ita9E35botqIYspQ4TkRAlCicdzKOjlyv/1Za5RyTNn7di//eEV0uTAfe3g==}
 
   emoji-regex@10.3.0:
     resolution: {integrity: sha512-QpLs9D9v9kArv4lfDEgg1X/gN5XLnf/A6l9cs8SPZLRZR3ZkY9+kwIQTxm+fsSej5UMYGE8fdoaZVIBlqG0XTw==}
@@ -1955,15 +1962,6 @@ packages:
 
   flatted@3.2.9:
     resolution: {integrity: sha512-36yxDn5H7OFZQla0/jFJmbIKTdZAQHngCedGxiMmpNfEZM0sdEeT+WczLQrjK6D7o2aiyLYDnkw0R3JK0Qv1RQ==}
-
-  follow-redirects@1.15.5:
-    resolution: {integrity: sha512-vSFWUON1B+yAw1VN4xMfxgn5fTUiaOzAJCKBwIIgT/+7CuGy9+r+5gITvP62j3RmaD5Ph65UaERdOSRGUzZtgw==}
-    engines: {node: '>=4.0'}
-    peerDependencies:
-      debug: '*'
-    peerDependenciesMeta:
-      debug:
-        optional: true
 
   follow-redirects@1.15.6:
     resolution: {integrity: sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==}
@@ -2620,8 +2618,8 @@ packages:
   node-releases@2.0.14:
     resolution: {integrity: sha512-y10wOWt8yZpqXmOgRo77WaHEmhYQYGNA6y421PKsKYWEK8aW+cqAphborZDhqfyKrbZEN92CN1X2KbafY2s7Yw==}
 
-  nodemon@3.1.7:
-    resolution: {integrity: sha512-hLj7fuMow6f0lbB0cD14Lz2xNjwsyruH251Pk4t/yIitCFJbmY1myuLlHm/q06aST4jg6EgAh74PIBBrRqpVAQ==}
+  nodemon@3.1.9:
+    resolution: {integrity: sha512-hdr1oIb2p6ZSxu3PB2JWWYS7ZQ0qvaZsc3hK8DR8f02kRzc8rjYmxAIvdz+aYC+8F2IjNaB7HMcSDg8nQpJxyg==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -3509,12 +3507,12 @@ packages:
       utf-8-validate:
         optional: true
 
-  ws@8.3.0:
-    resolution: {integrity: sha512-Gs5EZtpqZzLvmIM59w4igITU57lrtYVFneaa434VROv4thzJyV6UjIL3D42lslWlI+D4KzLYnxSwtfuiO79sNw==}
+  ws@8.18.1:
+    resolution: {integrity: sha512-RKW2aJZMXeMxVpnZ6bck+RswznaxmzdULiBr6KY7XkTnW8uvt0iT9H5DkHUChXrc+uurzwa0rVI16n/Xzjdz1w==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
-      utf-8-validate: ^5.0.2
+      utf-8-validate: '>=5.0.2'
     peerDependenciesMeta:
       bufferutil:
         optional: true
@@ -3715,15 +3713,6 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.4.0
       '@noble/secp256k1': 1.7.1
-
-  '@cell-studio/mempool.js@2.4.0':
-    dependencies:
-      axios: 1.6.7
-      ws: 8.3.0
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - utf-8-validate
 
   '@ckb-lumos/base@0.22.2':
     dependencies:
@@ -4164,6 +4153,15 @@ snapshots:
       - encoding
       - supports-color
 
+  '@mempool/mempool.js@3.0.0':
+    dependencies:
+      axios: 1.7.4
+      ws: 8.18.1
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - utf-8-validate
+
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.2':
     optional: true
 
@@ -4182,32 +4180,32 @@ snapshots:
   '@msgpackr-extract/msgpackr-extract-win32-x64@3.0.2':
     optional: true
 
-  '@nervosnetwork/ckb-sdk-core@0.109.1':
+  '@nervosnetwork/ckb-sdk-core@0.109.5':
     dependencies:
-      '@nervosnetwork/ckb-sdk-rpc': 0.109.1
-      '@nervosnetwork/ckb-sdk-utils': 0.109.1
-      '@nervosnetwork/ckb-types': 0.109.1
+      '@nervosnetwork/ckb-sdk-rpc': 0.109.5
+      '@nervosnetwork/ckb-sdk-utils': 0.109.5
+      '@nervosnetwork/ckb-types': 0.109.5
       tslib: 2.3.1
     transitivePeerDependencies:
       - debug
 
-  '@nervosnetwork/ckb-sdk-rpc@0.109.1':
+  '@nervosnetwork/ckb-sdk-rpc@0.109.5':
     dependencies:
-      '@nervosnetwork/ckb-sdk-utils': 0.109.1
-      axios: 1.6.7
+      '@nervosnetwork/ckb-sdk-utils': 0.109.5
+      axios: 1.7.4
       tslib: 2.3.1
     transitivePeerDependencies:
       - debug
 
-  '@nervosnetwork/ckb-sdk-utils@0.109.1':
+  '@nervosnetwork/ckb-sdk-utils@0.109.5':
     dependencies:
-      '@nervosnetwork/ckb-types': 0.109.1
+      '@nervosnetwork/ckb-types': 0.109.5
       bech32: 2.0.0
-      elliptic: 6.5.4
+      elliptic: 6.6.1
       jsbi: 3.1.3
       tslib: 2.3.1
 
-  '@nervosnetwork/ckb-types@0.109.1': {}
+  '@nervosnetwork/ckb-types@0.109.5': {}
 
   '@noble/hashes@1.4.0': {}
 
@@ -4230,13 +4228,13 @@ snapshots:
 
   '@polka/url@1.0.0-next.24': {}
 
-  '@rgbpp-sdk/btc@0.4.0(@ckb-lumos/lumos@0.22.2)':
+  '@rgbpp-sdk/btc@0.7.0(@ckb-lumos/lumos@0.22.2)':
     dependencies:
       '@bitcoinerlab/secp256k1': 1.1.1
       '@ckb-lumos/codec': 0.22.2
-      '@nervosnetwork/ckb-types': 0.109.1
-      '@rgbpp-sdk/ckb': 0.4.0(@ckb-lumos/lumos@0.22.2)(lodash@4.17.21)
-      '@rgbpp-sdk/service': 0.4.0
+      '@nervosnetwork/ckb-types': 0.109.5
+      '@rgbpp-sdk/ckb': 0.7.0(@ckb-lumos/lumos@0.22.2)(lodash@4.17.21)
+      '@rgbpp-sdk/service': 0.7.0
       bip32: 4.0.0
       bitcoinjs-lib: 6.1.5
       ecpair: 2.1.0
@@ -4246,15 +4244,15 @@ snapshots:
       - '@ckb-lumos/lumos'
       - debug
 
-  '@rgbpp-sdk/ckb@0.4.0(@ckb-lumos/lumos@0.22.2)(lodash@4.17.21)':
+  '@rgbpp-sdk/ckb@0.7.0(@ckb-lumos/lumos@0.22.2)(lodash@4.17.21)':
     dependencies:
       '@ckb-lumos/base': 0.22.2
       '@ckb-lumos/codec': 0.22.2
       '@exact-realty/multipart-parser': 1.0.13
-      '@nervosnetwork/ckb-sdk-core': 0.109.1
-      '@nervosnetwork/ckb-sdk-utils': 0.109.1
-      '@nervosnetwork/ckb-types': 0.109.1
-      '@rgbpp-sdk/service': 0.4.0
+      '@nervosnetwork/ckb-sdk-core': 0.109.5
+      '@nervosnetwork/ckb-sdk-utils': 0.109.5
+      '@nervosnetwork/ckb-types': 0.109.5
+      '@rgbpp-sdk/service': 0.7.0
       '@spore-sdk/core': 0.2.0-beta.9(@ckb-lumos/lumos@0.22.2)(lodash@4.17.21)
       axios: 1.7.7
       camelcase-keys: 7.0.2
@@ -4264,11 +4262,11 @@ snapshots:
       - debug
       - lodash
 
-  '@rgbpp-sdk/service@0.4.0':
+  '@rgbpp-sdk/service@0.7.0':
     dependencies:
       '@ckb-lumos/base': 0.22.2
       '@ckb-lumos/codec': 0.22.2
-      '@nervosnetwork/ckb-types': 0.109.1
+      '@nervosnetwork/ckb-types': 0.109.5
       lodash: 4.17.21
 
   '@rollup/pluginutils@4.2.1':
@@ -4525,6 +4523,8 @@ snapshots:
       eslint-visitor-keys: 3.4.3
 
   '@ungap/structured-clone@1.2.0': {}
+
+  '@utxostack/metadata@0.0.6': {}
 
   '@vercel/build-utils@7.7.0': {}
 
@@ -4859,9 +4859,9 @@ snapshots:
       camel-case: 4.1.2
       fast-glob: 3.3.2
 
-  axios@1.6.7:
+  axios@1.7.4:
     dependencies:
-      follow-redirects: 1.15.5
+      follow-redirects: 1.15.6
       form-data: 4.0.0
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -5276,7 +5276,7 @@ snapshots:
 
   electron-to-chromium@1.4.689: {}
 
-  elliptic@6.5.4:
+  elliptic@6.5.5:
     dependencies:
       bn.js: 4.12.0
       brorand: 1.1.0
@@ -5286,7 +5286,7 @@ snapshots:
       minimalistic-assert: 1.0.1
       minimalistic-crypto-utils: 1.0.1
 
-  elliptic@6.5.5:
+  elliptic@6.6.1:
     dependencies:
       bn.js: 4.12.0
       brorand: 1.1.0
@@ -5680,8 +5680,6 @@ snapshots:
       rimraf: 3.0.2
 
   flatted@3.2.9: {}
-
-  follow-redirects@1.15.5: {}
 
   follow-redirects@1.15.6: {}
 
@@ -6329,7 +6327,7 @@ snapshots:
 
   node-releases@2.0.14: {}
 
-  nodemon@3.1.7:
+  nodemon@3.1.9:
     dependencies:
       chokidar: 3.6.0
       debug: 4.3.4(supports-color@5.5.0)
@@ -7194,7 +7192,7 @@ snapshots:
 
   ws@8.16.0: {}
 
-  ws@8.3.0: {}
+  ws@8.18.1: {}
 
   xdg-app-paths@5.1.0:
     dependencies:
