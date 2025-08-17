@@ -9,7 +9,7 @@ import {
   getSecp256k1CellDep,
   getSporeTypeDep,
   isClusterSporeTypeSupported,
-  updateCkbTxWithRealBtcTxId,
+  replaceLockArgsWithRealBtcTxId,
 } from '@rgbpp-sdk/ckb';
 import {
   btcTxIdAndAfterFromBtcTimeLockArgs,
@@ -247,7 +247,22 @@ export default class TransactionProcessor
     });
     if (needUpdateCkbTx) {
       this.cradle.logger.info(`[TransactionProcessor] Update CKB Raw Transaction with real BTC txid: ${txid}`);
-      ckbRawTx = updateCkbTxWithRealBtcTxId({ ckbRawTx, btcTxId: txid, isMainnet: IS_MAINNET });
+      const outputs = ckbRawTx.outputs.map((output) => {
+        if (isBtcTimeLock(output.lock) || isRgbppLock(output.lock)) {
+          return {
+            ...output,
+            lock: {
+              ...output.lock,
+              args: replaceLockArgsWithRealBtcTxId(output.lock.args, txid),
+            },
+          };
+        }
+        return output;
+      });
+      ckbRawTx = {
+        ...ckbRawTx,
+        outputs,
+      };
     }
     return ckbRawTx;
   }
