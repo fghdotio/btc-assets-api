@@ -194,10 +194,22 @@ const envSchema = z
      */
     UTXO_SYNC_REPEAT_MAX_DURATION: z.coerce.number().default(60 * 60 * 1000),
     /**
-     * UTXO sync repeat expired duration, used to remove the expired UTXO sync job
-     * 336 hours by default
+     * UTXO sync active window, an address keeps being synced for this long after its last request
+     * 2 hours by default
      */
-    UTXO_SYNC_REPEAT_EXPRIED_DURATION: z.coerce.number().default(336 * 60 * 60 * 1000),
+    UTXO_SYNC_REPEAT_EXPRIED_DURATION: z.coerce.number().default(2 * 60 * 60 * 1000),
+    /**
+     * UTXO sync restart cooldown, a request restarts the sync of an already synced address
+     * (immediate sync, backoff reset) at most once per this duration
+     * 30 minutes by default, same as the data cache expire duration
+     */
+    UTXO_SYNC_RESTART_COOLDOWN: z.coerce.number().default(30 * 60 * 1000),
+    /**
+     * UTXO sync permanent error cooldown, an address rejected by the bitcoin data provider
+     * (too many UTXOs / txs) is not synced again for this long
+     * 24 hours by default
+     */
+    UTXO_SYNC_PERMANENT_ERROR_COOLDOWN: z.coerce.number().default(24 * 60 * 60 * 1000),
     /**
      * UTXO sync data cache expire duration, used to cache the UTXO sync data
      * 30 minutes by default
